@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/png" href="digital-campaign (1).png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sales Tool</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #000000; color: #ededed; min-height: 100vh; }
+.tabs-nav { display: flex; gap: 4px; padding: 16px 20px 0; background: #000000; border-bottom: 1px solid #222; max-width: 1200px; margin: 0 auto; flex-wrap: wrap; }
+.tab-btn { padding: 10px 20px; border: 1px solid #222; border-bottom: none; background: #0a0a0a; color: #888; border-radius: 10px 10px 0 0; cursor: pointer; font-size: 0.88rem; font-weight: 500; transition: all 0.2s; }
+.tab-btn.active { background: #141414; color: #fff; border-color: #222; border-bottom-color: #141414; position: relative; }
+.tab-btn.active::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #ec4899, #8b5cf6); border-radius: 10px 10px 0 0; }
+.tab-btn:hover:not(.active) { color: #ccc; }
+.tab-page { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
+.tab-page.active { display: block; }
+.card { background: #0a0a0a; border: 1px solid #222; border-radius: 14px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.card h2 { font-size: 0.88rem; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, #22d3ee, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+@media(max-width:720px) { .grid2 { grid-template-columns: 1fr; } }
+.form-group { margin-bottom: 14px; }
+label { display: block; font-size: 0.75rem; color: #9ca3af; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+input[type="text"], input[type="date"], input[type="time"], select, textarea, input[type="number"] {
+  width: 100%; background: #000; border: 1px solid #333; border-radius: 8px; color: #fff;
+  padding: 9px 12px; font-size: 0.88rem; outline: none; transition: all 0.2s; font-family: inherit;
+}
+input:focus, select:focus, textarea:focus { border-color: #ec4899; box-shadow: 0 0 0 2px rgba(236,72,153,0.2); }
+textarea { resize: vertical; min-height: 70px; }
+.toggle-group { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.toggle-lbl { font-size: 0.85rem; color: #d1d5db; }
+.toggle { position: relative; width: 42px; height: 22px; cursor: pointer; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; inset: 0; background: #333; border-radius: 22px; transition: 0.3s; }
+.slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
+input:checked + .slider { background: #10b981; }
+input:checked + .slider:before { transform: translateX(20px); }
+.output-box { background: #000; border: 1px solid #222; border-radius: 10px; padding: 14px; font-size: 0.85rem; line-height: 1.75; white-space: pre-wrap; min-height: 80px; color: #e5e7eb; font-family: inherit; }
+.copy-btn { margin-top: 10px; width: 100%; padding: 10px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none; border-radius: 8px; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.copy-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.copy-btn.copied { background: #10b981; }
+.divider { border: none; border-top: 1px solid #222; margin: 18px 0; }
+.sal-row { display: flex; gap: 8px; }
+.sal-row select { flex: 0 0 100px; }
+.sal-row input { flex: 1; }
+.pill-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.pill { padding: 5px 12px; border: 1px solid #333; border-radius: 20px; font-size: 0.78rem; color: #aaa; cursor: pointer; transition: all 0.2s; background: #000; }
+.pill.active { background: linear-gradient(135deg, #f59e0b, #ef4444); border-color: transparent; color: #fff; }
+.pricing-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+.ptab { padding: 8px 18px; border: 1px solid #333; border-radius: 8px; background: #000; color: #aaa; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+.ptab.active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-color: transparent; color: #fff; }
+.plan-card { background: #000; border: 1px solid #222; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
+.plan-title { font-size: 0.88rem; font-weight: 600; color: #22d3ee; margin-bottom: 10px; }
+.plan-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.plan-field label { font-size: 0.7rem; color: #888; margin-bottom: 3px; }
+.plan-field input { padding: 6px 10px; font-size: 0.85rem; }
+.plan-computed { margin-top: 10px; font-size: 0.8rem; color: #888; line-height: 1.8; }
+.plan-computed span { color: #ec4899; font-weight: 600; }
+.gen-btn { width: 100%; padding: 11px; background: linear-gradient(135deg, #10b981, #3b82f6); border: none; border-radius: 8px; color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-bottom: 14px; transition: all 0.2s; }
+.gen-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.remark-select { margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="tabs-nav">
+  <button class="tab-btn active" onclick="switchTab('tab-demo',this)">📅 Demo Scheduled</button>
+  <button class="tab-btn" onclick="switchTab('tab-notint',this)">🚫 Not Interested</button>
+  <button class="tab-btn" onclick="switchTab('tab-pricing',this)">💰 Pricing</button>
+  <button class="tab-btn" onclick="switchTab('tab-reachout',this)">📞 Reach Out</button>
+  <button class="tab-btn" onclick="switchTab('tab-summary',this)">📋 Call Summary</button>
+</div>
+
+<!-- ═══ TAB 1: DEMO SCHEDULED ═══ -->
+<div class="tab-page active" id="tab-demo">
+  <div class="grid2">
+    <div class="card">
+      <h2>Session Details</h2>
+
+      <div class="form-group">
+        <label>Parent Name + Salutation</label>
+        <div class="sal-row">
+          <select id="salutation" onchange="generateDemo()"><option>Sir</option><option>Ma'am</option></select>
+          <input type="text" id="parentName" placeholder="e.g. Akhil" value="Akhil" oninput="generateDemo()">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Subject</label>
+        <select id="subject" onchange="generateDemo()">
+          <option>Coding</option><option>Maths</option><option>English</option><option>Science</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Date</label>
+        <input type="date" id="sessionDate" oninput="generateDemo()">
+      </div>
+
+      <div class="form-group">
+        <label>Time</label>
+        <input type="time" id="timeInput" value="18:00" oninput="generateDemo()">
+      </div>
+
+      <div class="form-group">
+        <label>Timezone</label>
+        <input type="text" id="timezoneLabel" value="BST" oninput="generateDemo()">
+      </div>
+
+      <div class="form-group">
+        <label>Zoom Link</label>
+        <input type="text" id="zoomLink" placeholder="https://zoom.us/j/..." value="https://zoom.us/j/94576209569" oninput="onZoomLinkChange()">
+      </div>
+
+      <div class="form-group">
+        <label>Meeting ID <span style="color:#6b7280;font-size:0.7rem;text-transform:none">(auto-filled from link, editable)</span></label>
+        <input type="text" id="meetingId" placeholder="e.g. 94576209569" oninput="generateDemo()">
+      </div>
+
+      <div class="form-group">
+        <label>Laptop / PC Mandatory?</label>
+        <div class="toggle-group">
+          <label class="toggle">
+            <input type="checkbox" id="laptopToggle" checked onchange="generateDemo()">
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-lbl" id="laptopLabel">Yes — mention laptop required</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Email Subject</h2>
+      <div class="output-box" id="emailSubjectOutput" style="min-height:unset;padding:10px 14px;font-weight:600;color:#22d3ee;"></div>
+      <button class="copy-btn" id="copySubjectBtn" onclick="copyText('emailSubjectOutput','copySubjectBtn')">Copy Subject</button>
+      <hr class="divider">
+      <h2>Email Message</h2>
+      <div class="output-box" id="emailOutput"></div>
+      <button class="copy-btn" id="copyEmailBtn" onclick="copyText('emailOutput','copyEmailBtn')">Copy Email</button>
+      <hr class="divider">
+      <h2>WhatsApp Message</h2>
+      <div class="output-box" id="waOutput"></div>
+      <button class="copy-btn" id="copyWaBtn" onclick="copyText('waOutput','copyWaBtn')">Copy WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 2: NOT INTERESTED ═══ -->
+<div class="tab-page" id="tab-notint">
+  <div class="grid2">
+    <div class="card">
+      <h2>Lead Details</h2>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="ni-name" placeholder="e.g. Manpreet Kaur" oninput="generateNI()">
+      </div>
+      <div class="form-group">
+        <label>Phone</label>
+        <input type="text" id="ni-phone" placeholder="e.g. 44746610565" oninput="generateNI()">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="text" id="ni-email" placeholder="e.g. name@gmail.com" oninput="generateNI()">
+      </div>
+      <div class="form-group">
+        <label>Dialer</label>
+        <div class="pill-group" id="dialer-pills">
+          <span class="pill active" onclick="selectDialerPill(this,'WhatsApp')">WhatsApp</span>
+          <span class="pill" onclick="selectDialerPill(this,'C7')">C7</span>
+          <span class="pill" onclick="selectDialerPill(this,'SMS')">SMS</span>
+          <span class="pill" onclick="selectDialerPill(this,'')">Custom</span>
+        </div>
+        <input type="text" id="ni-dialer-custom" placeholder="Custom dialer..." style="margin-top:6px;display:none" oninput="generateNI()">
+      </div>
+      <div class="form-group">
+        <label>Source</label>
+        <div class="pill-group" id="source-pills">
+          <span class="pill" onclick="selectPill(this,'Facebook')">Facebook</span>
+          <span class="pill" onclick="selectPill(this,'DSA Website')">DSA Website</span>
+          <span class="pill" onclick="selectPill(this,'DSA - Internal N')">DSA - Internal N</span>
+          <span class="pill active" onclick="selectPill(this,'')">Custom</span>
+        </div>
+        <input type="text" id="ni-source-custom" placeholder="Custom source..." style="margin-top:6px" oninput="generateNI()">
+      </div>
+      <div class="form-group">
+        <label>Remarks</label>
+        <select class="remark-select" id="remark-preset" onchange="applyRemarkPreset()">
+          <option value="">— Choose a template —</option>
+          <option value="Parent mentioned they are already enrolled in another institution and are not interested at this time.">Already enrolled elsewhere</option>
+          <option value="Parent spoke with the child — the child does not wish to attend any online classes.">Child not interested in online classes</option>
+          <option value="Parent said it's not the right time financially. May revisit in the future.">Financial reasons / revisit later</option>
+          <option value="No response after multiple follow-ups. Marking as not interested.">No response / ghosted</option>
+          <option value="custom">Custom remark</option>
+        </select>
+        <textarea id="ni-remarks" placeholder="Write remark here..." oninput="generateNI()"></textarea>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Internal Note</h2>
+      <div class="output-box" id="niOutput"></div>
+      <button class="copy-btn" id="copyNiBtn" onclick="copyText('niOutput','copyNiBtn')">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 3: PRICING ═══ -->
+<div class="tab-page" id="tab-pricing">
+  <div class="grid2">
+    <div class="card">
+      <h2>Pricing Plans</h2>
+      <div class="grid2" style="margin-bottom: 16px;">
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>Number of Students</label>
+          <input type="number" id="num-students" value="1" min="1" oninput="generatePricing()">
+        </div>
+        <div class="form-group" style="margin-bottom: 0;">
+          <label>Number of Subjects</label>
+          <input type="number" id="num-subjects" value="1" min="1" oninput="generatePricing()">
+        </div>
+      </div>
+
+      <div class="pricing-tabs">
+        <button class="ptab active" onclick="selectCurrency('GBP',this)">GBP (£)</button>
+        <button class="ptab" onclick="selectCurrency('EUR',this)">EUR (€)</button>
+        <button class="ptab" onclick="selectCurrency('INR',this)">INR (₹)</button>
+      </div>
+      <div id="plans-container"></div>
+    </div>
+    <div class="card">
+      <h2>Include in Message</h2>
+      <div id="plan-toggles"></div>
+      <button class="gen-btn" onclick="generatePricing()">Generate Message</button>
+      <div class="output-box" id="pricingOutput"></div>
+      <button class="copy-btn" id="copyPricingBtn" onclick="copyText('pricingOutput','copyPricingBtn')">Copy</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 4: REACH OUT ═══ -->
+<div class="tab-page" id="tab-reachout">
+  <div class="grid2">
+    <div class="card">
+      <h2>Lead Details</h2>
+
+      <div class="form-group">
+        <label>Your Name (Academic Counsellor)</label>
+        <input type="text" id="ro-bd" placeholder="e.g. John / Magesh" oninput="generateReachOut()">
+      </div>
+
+      <div class="form-group">
+        <label>Parent Name</label>
+        <input type="text" id="ro-parent" placeholder="e.g. Mr. Sharma" oninput="generateReachOut()">
+      </div>
+
+      <div class="form-group">
+        <label>Child Name (Optional)</label>
+        <input type="text" id="ro-child" placeholder="e.g. Aarav" oninput="generateReachOut()">
+      </div>
+
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="text" id="ro-phone" placeholder="e.g. 9876543210" oninput="generateReachOut()">
+      </div>
+
+      <div class="form-group">
+        <label>Email (Optional)</label>
+        <input type="text" id="ro-email" placeholder="e.g. name@gmail.com" oninput="generateReachOut()">
+      </div>
+
+      <div class="form-group">
+        <label>Course Interest</label>
+        <input type="text" id="ro-course" placeholder="e.g. Coding" oninput="generateReachOut()">
+      </div>
+
+      <div class="form-group">
+        <label>Additional Details</label>
+        <textarea id="ro-details" oninput="generateReachOut()"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>WhatsApp Message</h2>
+      <div class="output-box" id="reachOutWA"></div>
+      <button class="copy-btn" id="copyROWaBtn" onclick="copyText('reachOutWA','copyROWaBtn')">Copy WhatsApp</button>
+
+      <hr class="divider">
+
+      <h2>Email Message</h2>
+      <div class="output-box" id="reachOutEmail"></div>
+      <button class="copy-btn" id="copyROEmailBtn" onclick="copyText('reachOutEmail','copyROEmailBtn')">Copy Email</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TAB 5: CALL SUMMARY ═══ -->
+<div class="tab-page" id="tab-summary">
+  <div class="grid2">
+
+    <!-- FORM -->
+    <div class="card">
+      <h2>Call Summary Form</h2>
+
+      <div class="form-group">
+        <label>Parent Name</label>
+        <input type="text" id="cs-parent" oninput="generateSummary()">
+      </div>
+
+      <div class="form-group">
+        <label>Kid Name + Age</label>
+        <input type="text" id="cs-kid" placeholder="e.g. Aarav (12 years)" oninput="generateSummary()">
+      </div>
+
+      <div class="form-group">
+        <label>Demo Date</label>
+        <input type="date" id="cs-date" oninput="generateSummary()">
+      </div>
+
+      <div class="form-group">
+        <label>Demo Time (BST)</label>
+        <input type="time" id="cs-time" oninput="generateSummary()">
+      </div>
+
+      <div class="form-group">
+        <label>Duration (minutes)</label>
+        <input type="number" id="cs-duration" placeholder="e.g. 60" oninput="generateSummary()">
+      </div>
+
+      <div class="form-group">
+        <label>Subject</label>
+        <select id="cs-subject" onchange="generateSummary()">
+          <option>Coding</option>
+          <option>Maths</option>
+          <option>Science</option>
+          <option>English</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Pricing (£ / ₹ / €)</label>
+        <input type="text" id="cs-pricing" placeholder="e.g. £120 / ₹5000" oninput="generateSummary()">
+      </div>
+
+    </div>
+
+    <!-- OUTPUT -->
+    <div class="card">
+      <h2>WhatsApp Summary</h2>
+      <div class="output-box" id="cs-wa"></div>
+      <button class="copy-btn" id="btn-wa" onclick="copyText('cs-wa','btn-wa')">Copy WhatsApp</button>
+
+      <hr class="divider">
+
+      <h2>Email Summary</h2>
+      <div class="output-box" id="cs-email"></div>
+      <button class="copy-btn" id="btn-email" onclick="copyText('cs-email','btn-email')">Copy Email</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── TABS ──
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── TIME ──
+function getTime() {
+  const v = document.getElementById('timeInput').value; if (!v) return '';
+  const [h, m] = v.split(':'); let hh = parseInt(h);
+  return String(hh % 12 || 12).padStart(2, '0') + ':' + m + ' ' + (hh >= 12 ? 'PM' : 'AM');
+}
+function fmtDate(s) {
+  if (!s) return ''; const [y, mo, d] = s.split('-'); return mo + '/' + d + '/' + y;
+}
+(function () {
+  const t = new Date();
+  document.getElementById('sessionDate').value =
+    t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+})();
+
+// ── AUTO-POPULATE MEETING ID FROM ZOOM LINK ──
+function extractMeetingId(link) {
+  const match = link.match(/\/j\/(\d+)/);
+  return match ? match[1] : '';
+}
+function onZoomLinkChange() {
+  const link = document.getElementById('zoomLink').value.trim();
+  const mid = extractMeetingId(link);
+  if (mid) document.getElementById('meetingId').value = mid;
+  generateDemo();
+}
+onZoomLinkChange();
+
+// ── DEMO GENERATE ──
+function generateDemo() {
+  const name = document.getElementById('parentName').value.trim() || '[Name]';
+  const sal = document.getElementById('salutation').value;
+  const subj = document.getElementById('subject').value;
+  const date = fmtDate(document.getElementById('sessionDate').value);
+  const time = getTime();
+  const tz = document.getElementById('timezoneLabel').value.trim() || 'BST';
+  const link = document.getElementById('zoomLink').value.trim();
+  const mid = document.getElementById('meetingId').value.trim();
+  const laptop = document.getElementById('laptopToggle').checked;
+
+  document.getElementById('laptopLabel').textContent = laptop
+    ? 'Yes — mention laptop required' : 'No — skip laptop note';
+
+  const mats = subj === 'Maths' ? 'notebook, pen, and calculator'
+    : subj === 'Coding' ? 'notebook, pen, and a laptop or PC'
+    : subj === 'English' ? 'notebook, pen, and a dictionary'
+    : 'notebook, pen, and their textbook';
+
+  const laptopLine = laptop
+    ? '\n\n🖥️ Please ensure your child joins from a laptop or PC for the best experience.'
+    : '';
+
+  document.getElementById('emailOutput').textContent =
+`Dear ${name} ${sal},
+
+I hope you and your family are doing well.
+
+This is a friendly reminder about your child's upcoming ${subj} session scheduled for today.
+
+Session Details:
+  Date     : ${date}
+  Time     : ${time} ${tz}
+  Subject  : ${subj}
+
+Zoom Link  : ${link}
+Meeting ID : ${mid}
+
+Please ensure your child is ready with the following materials:
+  ${mats}
+
+We kindly request that your child joins the session 5 minutes early to avoid any last-minute delays.${laptopLine}
+
+Topics for today's session:
+  - Problem-Solving Techniques: interactive exercises with real-world examples
+  - Q&A: dedicated time for students to ask questions and clarify doubts
+
+We look forward to a productive and engaging session. If you have any questions or concerns, please don't hesitate to reach out.`;
+
+  document.getElementById('emailSubjectOutput').textContent =
+    `${subj} Session Scheduled at ${time} ${tz}${date ? ' | ' + date : ''}`;
+
+  const waLaptop = laptop ? ' Please use a laptop or PC. 💻' : '';
+  document.getElementById('waOutput').textContent =
+`Hi ${name} ${sal}! 😊
+
+📌 Reminder: *${subj} Session* — Today at *${time} ${tz}* (${date})
+
+🔗 Zoom: ${link}
+🔢 ID: ${mid}
+
+Please join 5 mins early.${waLaptop}`;
+}
+
+// ── NOT INTERESTED ──
+let niSource = '';
+let niDialer = 'WhatsApp';
+
+function selectPill(el, val) {
+  document.querySelectorAll('#source-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active'); niSource = val;
+  document.getElementById('ni-source-custom').style.display = val === '' ? 'block' : 'none';
+  generateNI();
+}
+
+function selectDialerPill(el, val) {
+  document.querySelectorAll('#dialer-pills .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active'); niDialer = val;
+  document.getElementById('ni-dialer-custom').style.display = val === '' ? 'block' : 'none';
+  generateNI();
+}
+
+function applyRemarkPreset() {
+  const v = document.getElementById('remark-preset').value;
+  if (v && v !== 'custom') document.getElementById('ni-remarks').value = v;
+  else if (v === 'custom') document.getElementById('ni-remarks').value = '';
+  generateNI();
+}
+
+function generateNI() {
+  const name = document.getElementById('ni-name').value.trim() || '[Name]';
+  const phone = document.getElementById('ni-phone').value.trim() || '[Phone]';
+  const email = document.getElementById('ni-email').value.trim() || '[Email]';
+  const dialer = niDialer || document.getElementById('ni-dialer-custom').value.trim() || '[Dialer]';
+  const source = niSource || document.getElementById('ni-source-custom').value.trim() || '[Source]';
+  const remark = document.getElementById('ni-remarks').value.trim() || '[Remarks]';
+  document.getElementById('niOutput').textContent =
+`*Not Interested*
+
+Name : ${name}
+Phone number : ${phone}
+Email id : ${email}
+Dialer : ${dialer}
+Source : ${source}
+Remarks : ${remark}`;
+}
+
+document.getElementById('ni-source-custom').style.display = 'block';
+document.getElementById('ni-dialer-custom').style.display = 'none';
+
+
+// ── PRICING ──
+const currencies = {
+  GBP: { sym: '£', defaultRates: [8, 8, 9, 9.5, 10.3] },
+  EUR: { sym: '€', defaultRates: [9, 9, 10, 10.5, 11.5] },
+  INR: { sym: '₹', defaultRates: [850, 850, 950, 1000, 1100] }
+};
+
+const planDefs = [
+  { key: 'oneshot', label: 'One-Shot Payment', installmentSessions: 144, months: null, rateIdx: 0 },
+  { key: 'p6month', label: '6-Month Installment', installmentSessions: 48, months: 6, rateIdx: 1 },
+  { key: 'p4month', label: '4-Month Installment', installmentSessions: 32, months: 4, rateIdx: 2 },
+  { key: 'p3month', label: '3-Month Installment', installmentSessions: 24, months: 3, rateIdx: 3 },
+  { key: 'p2month', label: '2-Month Installment', installmentSessions: 16, months: 2, rateIdx: 3 },
+];
+
+let activeCurrency = 'GBP';
+let planData = {};
+
+function initPlanData() {
+  ['GBP', 'EUR', 'INR'].forEach(cur => {
+    planData[cur] = planDefs.map(p => ({
+      ...p,
+      ratePerSession: currencies[cur].defaultRates[p.rateIdx]
+    }));
+  });
+}
+initPlanData();
+
+function selectCurrency(cur, el) {
+  activeCurrency = cur;
+  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('plans-container').innerHTML = '';
+  document.getElementById('plan-toggles').innerHTML = '';
+  renderPlans();
+}
+
+function renderPlans() {
+  const sym = currencies[activeCurrency].sym;
+  const plans = planData[activeCurrency];
+  const container = document.getElementById('plans-container');
+  const togglesDiv = document.getElementById('plan-toggles');
+
+  if (container.children.length === 0) {
+    container.innerHTML = ''; togglesDiv.innerHTML = '';
+    plans.forEach((p, i) => {
+      container.innerHTML += `
+<div class="plan-card">
+  <div class="plan-title">${p.label}</div>
+  <div class="plan-fields">
+    <div class="plan-field">
+      <label>Sessions in period</label>
+      <input type="number" value="${p.installmentSessions}" min="1"
+        oninput="updatePlan('${activeCurrency}',${i},'installmentSessions',this.value)">
+    </div>
+    <div class="plan-field">
+      <label>Rate per session (${sym})</label>
+      <input type="number" value="${p.ratePerSession}" min="0" step="0.1"
+        oninput="updatePlan('${activeCurrency}',${i},'ratePerSession',this.value)">
+    </div>
+  </div>
+  <div class="plan-computed" id="computed-plan-${i}"></div>
+</div>`;
+
+      togglesDiv.innerHTML += `
+<div class="toggle-group" style="margin-bottom:12px">
+  <label class="toggle"><input type="checkbox" id="toggle-plan-${i}" checked><span class="slider"></span></label>
+  <span class="toggle-lbl">${p.label}</span>
+</div>`;
+    });
+  }
+  updateCalculations();
+}
+
+function updateCalculations() {
+  const sym = currencies[activeCurrency].sym;
+  const plans = planData[activeCurrency];
+  plans.forEach((p, i) => {
+    const installAmt = (p.ratePerSession * p.installmentSessions).toFixed(2);
+    const avgPerSess = p.ratePerSession.toFixed(2);
+    const periodLabel = p.key === 'oneshot' ? 'one payment' : `every ${p.months} months`;
+    const computedEl = document.getElementById(`computed-plan-${i}`);
+    if (computedEl) {
+      computedEl.innerHTML = `<span>${p.installmentSessions}</span> sessions &nbsp;&middot;&nbsp; <span>${sym}${avgPerSess}/session</span> &nbsp;&middot;&nbsp; Total <span>${sym}${installAmt}</span> ${periodLabel}`;
+    }
+  });
+}
+
+function updatePlan(cur, idx, field, val) {
+  planData[cur][idx][field] = parseFloat(val) || 0;
+  updateCalculations();
+}
+
+function generatePricing() {
+  const sym = currencies[activeCurrency].sym;
+  const plans = planData[activeCurrency];
+
+  const numStudents = document.getElementById('num-students')?.value || 1;
+  const numSubjects = document.getElementById('num-subjects')?.value || 1;
+  const studentText = numStudents == 1 ? '1 student' : `${numStudents} students`;
+  const subjectText = numSubjects == 1 ? '1 subject' : `${numSubjects} subjects`;
+
+  let lines = `*Pricing Details (${activeCurrency})*\nFor ${studentText} and ${subjectText} | Valid only for enrollment in this session\n`;
+
+  plans.forEach((p, i) => {
+    const chk = document.getElementById(`toggle-plan-${i}`);
+    if (!chk || !chk.checked) return;
+    const installAmt = (p.ratePerSession * p.installmentSessions).toFixed(2);
+    const periodLabel = p.key === 'oneshot' ? '(one payment)' : `every ${p.months} months`;
+    lines += `\n*${p.label}*\n`;
+    lines += `  • ${p.installmentSessions} sessions${p.key !== 'oneshot' ? ' over ' + p.months + ' months' : ''}\n`;
+    lines += `  • ${sym}${p.ratePerSession.toFixed(2)}/session\n`;
+    lines += `  • Total of ${sym}${installAmt} ${periodLabel}\n`;
+  });
+
+  document.getElementById('pricingOutput').textContent = lines;
+}
+
+// ── COPY (unified, works for all buttons) ──
+function copyText(outputId, btnId) {
+  const el = document.getElementById(outputId);
+  const plainText = el.textContent;
+
+  const btn = document.getElementById(btnId);
+  const orig = btn ? btn.textContent : '';
+
+  function showCopied() {
+    if (!btn) return;
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.classList.remove('copied');
+    }, 2000);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(plainText).then(showCopied).catch(() => fallbackCopy());
+  } else {
+    fallbackCopy();
+  }
+
+  function fallbackCopy() {
+    const ta = document.createElement('textarea');
+    ta.value = plainText;
+    ta.style.position = 'absolute';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); showCopied(); } catch (e) { }
+    document.body.removeChild(ta);
+  }
+}
+
+// ── REACH OUT ──
+function generateReachOut() {
+  const bd = document.getElementById('ro-bd').value.trim() || '{{NAME}}';
+  const parent = document.getElementById('ro-parent').value.trim() || '';
+
+  const waMsg =
+`Hello, I am ${bd}, Academic Counsellor from Codeyoung. I would like to reach out regarding the free demo session. Kindly let me know a convenient time for a call so I can explain all the details.`;
+
+  const emailMsg =
+`Dear${parent ? ' ' + parent : ' Parent'},
+
+I hope you are doing well. I am ${bd}, Academic Counsellor from Codeyoung. I am reaching out regarding the free demo session. Kindly let me know a suitable time for a call so I can explain the complete details.`;
+
+  document.getElementById('reachOutWA').textContent = waMsg;
+  document.getElementById('reachOutEmail').textContent = emailMsg;
+}
+
+// ── CALL SUMMARY ──
+function generateSummary() {
+  const parent = document.getElementById('cs-parent').value || '[Parent Name]';
+  const kid = document.getElementById('cs-kid').value || '[Kid Name & Age]';
+  const date = document.getElementById('cs-date').value || '[Date]';
+  const time = document.getElementById('cs-time').value || '[Time]';
+  const duration = document.getElementById('cs-duration').value || '[Duration]';
+  const subject = document.getElementById('cs-subject').value || '[Subject]';
+  const pricing = document.getElementById('cs-pricing').value || '[Pricing]';
+
+  const email =
+`Dear ${parent},
+
+Here is the call summary for your child's demo session:
+
+📌 Parent Name: ${parent}
+👶 Kid: ${kid}
+📅 Demo Date: ${date}
+⏰ Demo Time (BST): ${time}
+⏳ Duration: ${duration} minutes
+📚 Subject: ${subject}
+💰 Pricing: ${pricing}
+
+⚠️ IMPORTANT:
+To avail the discount, the payment must be completed within the session itself.
+
+If you have any questions, feel free to reach out.`;
+
+  const wa =
+`Hi ${parent}! 😊
+
+Here is your demo call summary:
+
+👶 Kid: ${kid}
+📅 Date: ${date}
+⏰ Time (BST): ${time}
+⏳ Duration: ${duration} mins
+📚 Subject: ${subject}
+💰 Pricing: ${pricing}
+
+⚠️ Discount is applicable only if payment is done within the session.
+
+Let us know if you need any help! 🚀`;
+
+  document.getElementById('cs-email').textContent = email;
+  document.getElementById('cs-wa').textContent = wa;
+}
+
+// ── INIT ──
+generateReachOut();
+generateDemo();
+generateNI();
+renderPlans();
+generateSummary();
+</script>
+
+</body>
+</html>
