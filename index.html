@@ -1,437 +1,762 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" type="image/png" href="digital-campaign (1).png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sales Tool</title>
+<script>
+  try { document.documentElement.dataset.theme = localStorage.getItem('salestool:theme') || 'forest'; }
+  catch (e) { document.documentElement.dataset.theme = 'forest'; }
+</script>
+<link rel="icon" type="image/png" href="digital-campaign (1).png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #000000; color: #ededed; min-height: 100vh; }
-.tabs-nav { display: flex; gap: 4px; padding: 16px 20px 0; background: #000000; border-bottom: 1px solid #222; max-width: 1200px; margin: 0 auto; flex-wrap: wrap; }
-.tab-btn { padding: 10px 20px; border: 1px solid #222; border-bottom: none; background: #0a0a0a; color: #888; border-radius: 10px 10px 0 0; cursor: pointer; font-size: 0.88rem; font-weight: 500; transition: all 0.2s; }
-.tab-btn.active { background: #141414; color: #fff; border-color: #222; border-bottom-color: #141414; position: relative; }
-.tab-btn.active::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #ec4899, #8b5cf6); border-radius: 10px 10px 0 0; }
-.tab-btn:hover:not(.active) { color: #ccc; }
-.tab-page { display: none; padding: 20px; max-width: 1200px; margin: 0 auto; }
-.tab-page.active { display: block; }
-.card { background: #0a0a0a; border: 1px solid #222; border-radius: 14px; padding: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
-.card h2 { font-size: 0.88rem; margin-bottom: 16px; text-transform: uppercase; letter-spacing: 1px; background: linear-gradient(90deg, #22d3ee, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; display: inline-block; }
-.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-@media(max-width:720px) { .grid2 { grid-template-columns: 1fr; } }
-.form-group { margin-bottom: 14px; }
-label { display: block; font-size: 0.75rem; color: #9ca3af; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-input[type="text"], input[type="date"], input[type="time"], select, textarea, input[type="number"] {
-  width: 100%; background: #000; border: 1px solid #333; border-radius: 8px; color: #fff;
-  padding: 9px 12px; font-size: 0.88rem; outline: none; transition: all 0.2s; font-family: inherit;
+:root {
+  --ink: #12142a;          /* page */
+  --panel: #1a1d38;        /* form panels */
+  --panel-2: #222648;      /* inputs / raised */
+  --line: #333864;
+  --text: #eceefb;
+  --muted: #9aa0c7;
+  --accent: #ffc83d;       /* the one loud colour */
+  --accent-ink: #2a2000;
+  --wa: #3ddc97;
+  --mail: #8fb0ff;
+  --danger: #ff7a7a;
+  --r-lg: 18px; --r-md: 12px; --r-sm: 8px;
+  --head: 'Bricolage Grotesque', 'Segoe UI', system-ui, sans-serif;
+  --body: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+  color-scheme: dark;
 }
-input:focus, select:focus, textarea:focus { border-color: #ec4899; box-shadow: 0 0 0 2px rgba(236,72,153,0.2); }
-textarea { resize: vertical; min-height: 70px; }
-.toggle-group { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-.toggle-lbl { font-size: 0.85rem; color: #d1d5db; }
-.toggle { position: relative; width: 42px; height: 22px; cursor: pointer; flex-shrink: 0; }
-.toggle input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; inset: 0; background: #333; border-radius: 22px; transition: 0.3s; }
-.slider:before { content: ''; position: absolute; width: 16px; height: 16px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.3s; }
-input:checked + .slider { background: #10b981; }
-input:checked + .slider:before { transform: translateX(20px); }
-.output-box { background: #000; border: 1px solid #222; border-radius: 10px; padding: 14px; font-size: 0.85rem; line-height: 1.75; white-space: pre-wrap; min-height: 80px; color: #e5e7eb; font-family: inherit; }
-.copy-btn { margin-top: 10px; width: 100%; padding: 10px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none; border-radius: 8px; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-.copy-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-.copy-btn.copied { background: #10b981; }
-.divider { border: none; border-top: 1px solid #222; margin: 18px 0; }
+/* Themes: default :root is "midnight" */
+html[data-theme="forest"] { --ink:#0e1d18; --panel:#15291f; --panel-2:#1c3629; --line:#2d4d3d; --text:#e8f5ee; --muted:#8fb5a1; --accent:#ff8a5b; --accent-ink:#2b0f05; --wa:#4be3a0; --mail:#8fc3ff; }
+html[data-theme="rose"] { --ink:#22101b; --panel:#311828; --panel-2:#3f2035; --line:#5a3350; --text:#fbeaf3; --muted:#c99bb7; --accent:#7cf0d0; --accent-ink:#04271e; --wa:#5be8a8; --mail:#b9a8ff; }
+html[data-theme="daylight"] { --ink:#f4f5fb; --panel:#ffffff; --panel-2:#eceef8; --line:#d6d9ec; --text:#1b1e3a; --muted:#5b6188; --accent:#5b3df5; --accent-ink:#ffffff; --wa:#14a06a; --mail:#3b61c9; color-scheme: light; }
+html[data-theme="daylight"] ::placeholder { color: #9aa0c4; }
+html[data-theme="daylight"] .plan input { background: #fff; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body { font-family: var(--body); background: var(--ink); color: var(--text); min-height: 100vh; line-height: 1.5; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* ───────── Loader ───────── */
+#loader { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; justify-items: center; gap: 22px; background: var(--ink); transition: opacity .5s ease, visibility .5s; }
+#loader.done { opacity: 0; visibility: hidden; pointer-events: none; }
+#loader svg { width: min(240px, 60vw); height: auto; overflow: visible; }
+#loader .line { fill: none; stroke: var(--accent); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; }
+#loader .line.base { stroke: var(--line); stroke-width: 4; }
+#loader p { font-family: var(--head); font-size: 1.05rem; color: var(--muted); letter-spacing: .02em; }
+.no-anim #loader .line { animation: pulse 1.2s ease-in-out infinite alternate; }
+@keyframes pulse { from { opacity: .35; } to { opacity: 1; } }
+
+/* ───────── Shell ───────── */
+.app { display: grid; grid-template-columns: 232px minmax(0, 1fr); min-height: 100vh; max-width: 1360px; margin: 0 auto; }
+.side { position: sticky; top: 0; height: 100vh; padding: 28px 16px; display: flex; flex-direction: column; gap: 28px; border-right: 1px solid var(--line); }
+.brand { font-family: var(--head); font-weight: 700; font-size: 1.25rem; padding: 0 10px; display: flex; align-items: center; gap: 10px; }
+.brand i { width: 12px; height: 12px; border-radius: 4px; background: var(--accent); display: inline-block; transform: rotate(45deg); }
+.nav { display: flex; flex-direction: column; gap: 4px; }
+.nav button { display: flex; align-items: center; gap: 12px; text-align: left; padding: 11px 12px; border: 0; background: transparent; color: var(--muted); border-radius: var(--r-md); cursor: pointer; font-weight: 500; transition: background .15s, color .15s; }
+.nav button .ic { width: 22px; text-align: center; }
+.nav button:hover { color: var(--text); background: var(--panel); }
+.nav button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.side small { margin-top: 0; color: var(--muted); font-size: .78rem; padding: 0 10px; }
+
+main { padding: 32px clamp(16px, 3vw, 40px) 64px; }
+.page { display: none; }
+.page.active { display: block; }
+.page-head { margin-bottom: 24px; max-width: 60ch; }
+.page-head h1 { font-family: var(--head); font-size: clamp(1.6rem, 3vw, 2.1rem); line-height: 1.15; font-weight: 700; }
+.page-head p { color: var(--muted); margin-top: 6px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; align-items: start; }
+
+/* ───────── Form panel ───────── */
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 22px; }
+.panel > h2 { font-family: var(--head); font-size: 1.05rem; margin-bottom: 18px; font-weight: 700; }
+.form-group { margin-bottom: 16px; }
+.form-group:last-child { margin-bottom: 0; }
+.field-label, .form-group > label { display: block; font-size: .82rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+.hint { color: var(--muted); font-weight: 400; opacity: .8; }
+input[type="text"], input[type="date"], input[type="time"], input[type="number"], select, textarea {
+  width: 100%; background: var(--panel-2); border: 1px solid var(--line); border-radius: var(--r-sm); padding: 10px 12px; outline: none; transition: border-color .15s, box-shadow .15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,200,61,.18); }
+textarea { resize: vertical; min-height: 84px; }
+::placeholder { color: #6b719c; }
 .sal-row { display: flex; gap: 8px; }
-.sal-row select { flex: 0 0 100px; }
-.sal-row input { flex: 1; }
-.pill-group { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-.pill { padding: 5px 12px; border: 1px solid #333; border-radius: 20px; font-size: 0.78rem; color: #aaa; cursor: pointer; transition: all 0.2s; background: #000; }
-.pill.active { background: linear-gradient(135deg, #f59e0b, #ef4444); border-color: transparent; color: #fff; }
-.pricing-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
-.ptab { padding: 8px 18px; border: 1px solid #333; border-radius: 8px; background: #000; color: #aaa; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
-.ptab.active { background: linear-gradient(135deg, #3b82f6, #8b5cf6); border-color: transparent; color: #fff; }
-.plan-card { background: #000; border: 1px solid #222; border-radius: 10px; padding: 14px; margin-bottom: 12px; }
-.plan-title { font-size: 0.88rem; font-weight: 600; color: #22d3ee; margin-bottom: 10px; }
-.plan-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.plan-field label { font-size: 0.7rem; color: #888; margin-bottom: 3px; }
-.plan-field input { padding: 6px 10px; font-size: 0.85rem; }
-.plan-computed { margin-top: 10px; font-size: 0.8rem; color: #888; line-height: 1.8; }
-.plan-computed span { color: #ec4899; font-weight: 600; }
-.gen-btn { width: 100%; padding: 11px; background: linear-gradient(135deg, #10b981, #3b82f6); border: none; border-radius: 8px; color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer; margin-bottom: 14px; transition: all 0.2s; }
-.gen-btn:hover { opacity: 0.9; transform: translateY(-1px); }
-.remark-select { margin-bottom: 8px; }
+.sal-row select { flex: 0 0 96px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* switch */
+.switch { display: flex; align-items: center; gap: 12px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch .track { position: relative; width: 44px; height: 24px; background: var(--line); border-radius: 24px; flex-shrink: 0; transition: background .2s; }
+.switch .track::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.switch input:checked + .track { background: var(--wa); }
+.switch input:checked + .track::after { transform: translateX(20px); }
+.switch input:focus-visible + .track { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+/* pills */
+.pill-group { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { padding: 6px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); color: var(--muted); cursor: pointer; font-size: .85rem; transition: all .15s; }
+.pill:hover { color: var(--text); }
+.pill.active { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.pill-custom { margin-top: 8px; }
+
+/* ───────── Outputs ───────── */
+.outputs { display: flex; flex-direction: column; gap: 20px; }
+.out { border-radius: var(--r-lg); background: var(--panel); border: 1px solid var(--line); overflow: hidden; }
+.out header { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px 12px 18px; border-bottom: 1px solid var(--line); }
+.out header h3 { font-family: var(--head); font-size: .98rem; font-weight: 700; display: flex; align-items: center; gap: 10px; }
+.out header h3::before { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--muted); }
+.out.wa header h3::before { background: var(--wa); }
+.out.mail header h3::before { background: var(--mail); }
+.out.note header h3::before { background: var(--accent); }
+.copy { padding: 7px 16px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel-2); cursor: pointer; font-size: .85rem; font-weight: 700; transition: all .15s; }
+.copy:hover { border-color: var(--accent); color: var(--accent); }
+.copy.copied { background: var(--wa); border-color: var(--wa); color: #06281a; }
+.output-box { padding: 16px 18px; font-size: .92rem; line-height: 1.7; white-space: pre-wrap; word-break: break-word; min-height: 72px; max-height: 420px; overflow: auto; }
+.out.wa .output-box { background: rgba(61,220,151,.05); }
+.out.subject .output-box { min-height: unset; font-weight: 700; color: var(--mail); }
+
+/* ───────── Pricing ───────── */
+.cur-tabs { display: inline-flex; padding: 4px; background: var(--panel-2); border-radius: 999px; margin: 16px 0; border: 1px solid var(--line); }
+.cur-tabs button { padding: 7px 18px; border: 0; background: transparent; color: var(--muted); border-radius: 999px; cursor: pointer; font-weight: 500; }
+.cur-tabs button.active { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.plan { border: 1px solid var(--line); border-radius: var(--r-md); padding: 14px; margin-bottom: 12px; background: var(--panel-2); }
+.plan h4 { font-family: var(--head); font-size: .95rem; margin-bottom: 10px; }
+.plan .row2 label { font-size: .75rem; color: var(--muted); display: block; margin-bottom: 4px; }
+.plan input { padding: 7px 10px; background: var(--ink); }
+.plan-sum { margin-top: 10px; font-size: .85rem; color: var(--muted); }
+.plan-sum b { color: var(--accent); font-weight: 700; }
+.toggles { display: flex; flex-direction: column; gap: 12px; margin-bottom: 18px; }
+
+/* ───────── Welcome page ───────── */
+body[data-view="home"] .app { display: none; }
+body[data-view="tool"] #home { display: none; }
+button.brand { background: none; border: 0; color: var(--text); cursor: pointer; text-align: left; width: 100%; border-radius: var(--r-md); padding-top: 6px; padding-bottom: 6px; }
+button.brand:hover { background: var(--panel); }
+.home { min-height: 100vh; max-width: 1180px; margin: 0 auto; padding: clamp(24px, 5vw, 64px); display: grid; align-items: center; }
+.home-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: clamp(32px, 6vw, 88px); align-items: center; }
+.home:not(.shown) [data-in] { opacity: 0; }
+.home-mark { display: block; width: 112px; height: auto; margin-bottom: 28px; overflow: visible; }
+.home-mark .line { fill: none; stroke: var(--accent); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+.home-mark .line.base { stroke: var(--line); stroke-width: 5; }
+.home h1 { font-family: var(--head); font-size: clamp(2.3rem, 5.4vw, 3.8rem); line-height: 1.05; font-weight: 700; letter-spacing: -.02em; }
+.home .lead { color: var(--muted); margin: 14px 0 28px; font-size: 1.05rem; max-width: 36ch; }
+.home-name { max-width: 340px; }
+.tool-list { list-style: none; border-top: 1px solid var(--line); }
+.tool-list li { border-bottom: 1px solid var(--line); }
+.tool-row { width: 100%; display: grid; grid-template-columns: 44px 1fr auto; align-items: center; gap: 16px; text-align: left; padding: 18px 12px; background: transparent; border: 0; cursor: pointer; border-radius: var(--r-md); transition: background .15s, padding-left .2s; }
+.tool-row:hover { background: var(--panel); padding-left: 20px; }
+.tool-row .ic { font-size: 1.4rem; width: 44px; height: 44px; display: grid; place-items: center; background: var(--panel-2); border-radius: var(--r-md); }
+.tool-row strong { font-family: var(--head); font-size: 1.12rem; display: block; font-weight: 700; }
+.tool-row .d { color: var(--muted); font-size: .9rem; }
+.tool-row .go { color: var(--accent); font-size: 1.7rem; line-height: 1; }
+@media (max-width: 860px) { .home-grid { grid-template-columns: 1fr; } .home { align-items: start; } }
+
+/* ───────── Theme picker ───────── */
+.themes { display: flex; align-items: center; gap: 10px; }
+.side .themes { margin-top: auto; padding: 0 10px; }
+.themes .lbl { font-size: .82rem; color: var(--muted); margin-right: 2px; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%); transition: transform .15s; }
+.swatch:hover { transform: scale(1.12); }
+.swatch[aria-pressed="true"] { border-color: var(--text); box-shadow: 0 0 0 2px var(--ink), 0 0 0 4px var(--accent); }
+.home .themes { margin-top: 22px; }
+
+.theme-block { margin-top: 26px; max-width: 420px; }
+.theme-title { font-family: var(--head); font-weight: 700; font-size: 1rem; margin-bottom: 10px; }
+.theme-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.theme-opt { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--r-md); background: var(--panel); cursor: pointer; font-weight: 500; text-align: left; transition: border-color .15s, background .15s; }
+.theme-opt:hover { border-color: var(--muted); }
+.theme-opt[aria-pressed="true"] { border-color: var(--accent); background: var(--panel-2); font-weight: 700; box-shadow: 0 0 0 1px var(--accent); }
+.theme-opt .chip { width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0; border: 2px solid var(--line); background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%); }
+
+/* ───────── Toast ───────── */
+#toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--text); color: var(--ink); padding: 10px 18px; border-radius: 999px; font-weight: 700; font-size: .9rem; opacity: 0; pointer-events: none; transition: all .25s; z-index: 50; }
+#toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ───────── Responsive ───────── */
+@media (max-width: 960px) {
+  .app { grid-template-columns: 1fr; }
+  .side { position: static; height: auto; flex-direction: column; gap: 14px; padding: 16px 16px 0; border-right: 0; border-bottom: 1px solid var(--line); }
+  .nav { flex-direction: row; overflow-x: auto; padding-bottom: 12px; scrollbar-width: none; }
+  .nav button { white-space: nowrap; padding: 9px 14px; }
+  .side small { display: none; }
+  .grid2 { grid-template-columns: 1fr; }
+  main { padding-top: 24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+  html { scroll-behavior: auto; }
+}
 </style>
 </head>
-<body>
+<body data-view="home">
 
-<div class="tabs-nav">
-  <button class="tab-btn active" onclick="switchTab('tab-demo',this)">📅 Demo Scheduled</button>
-  <button class="tab-btn" onclick="switchTab('tab-notint',this)">🚫 Not Interested</button>
-  <button class="tab-btn" onclick="switchTab('tab-pricing',this)">💰 Pricing</button>
-  <button class="tab-btn" onclick="switchTab('tab-reachout',this)">📞 Reach Out</button>
-  <button class="tab-btn" onclick="switchTab('tab-summary',this)">📋 Call Summary</button>
+<!-- ═══ LOADER ═══ -->
+<div id="loader" role="status" aria-live="polite">
+  <svg viewBox="0 0 200 130" aria-hidden="true">
+    <line class="line base" x1="30" y1="116" x2="170" y2="116"/>
+    <polyline class="line" points="72,34 42,62 72,90"/>
+    <line class="line" x1="113" y1="26" x2="87" y2="98"/>
+    <polyline class="line" points="128,34 158,62 128,90"/>
+  </svg>
+  <p>Getting your tools ready</p>
 </div>
 
-<!-- ═══ TAB 1: DEMO SCHEDULED ═══ -->
-<div class="tab-page active" id="tab-demo">
-  <div class="grid2">
-    <div class="card">
-      <h2>Session Details</h2>
-
-      <div class="form-group">
-        <label>Parent Name + Salutation</label>
-        <div class="sal-row">
-          <select id="salutation" onchange="generateDemo()"><option>Sir</option><option>Ma'am</option></select>
-          <input type="text" id="parentName" placeholder="e.g. Akhil" value="Akhil" oninput="generateDemo()">
-        </div>
+<!-- ═══ WELCOME (first page) ═══ -->
+<section class="home" id="home" aria-label="Welcome">
+  <div class="home-grid">
+    <div>
+      <svg class="home-mark" data-in viewBox="0 0 200 130" aria-hidden="true">
+        <line class="line base" x1="30" y1="116" x2="170" y2="116"/>
+        <polyline class="line" points="72,34 42,62 72,90"/>
+        <line class="line" x1="113" y1="26" x2="87" y2="98"/>
+        <polyline class="line" points="128,34 158,62 128,90"/>
+      </svg>
+      <h1 id="home-title" data-in>Welcome</h1>
+      <p class="lead" data-in>Pick what you need to send. Your name is added to the messages for you.</p>
+      <div class="form-group home-name" data-in>
+        <label for="home-name">Your name</label>
+        <input type="text" id="home-name" placeholder="e.g. John" autocomplete="given-name">
       </div>
-
-      <div class="form-group">
-        <label>Subject</label>
-        <select id="subject" onchange="generateDemo()">
-          <option>Coding</option><option>Maths</option><option>English</option><option>Science</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Date</label>
-        <input type="date" id="sessionDate" oninput="generateDemo()">
-      </div>
-
-      <div class="form-group">
-        <label>Time</label>
-        <input type="time" id="timeInput" value="18:00" oninput="generateDemo()">
-      </div>
-
-      <div class="form-group">
-        <label>Timezone</label>
-        <input type="text" id="timezoneLabel" value="BST" oninput="generateDemo()">
-      </div>
-
-      <div class="form-group">
-        <label>Zoom Link</label>
-        <input type="text" id="zoomLink" placeholder="https://zoom.us/j/..." value="https://zoom.us/j/94576209569" oninput="onZoomLinkChange()">
-      </div>
-
-      <div class="form-group">
-        <label>Meeting ID <span style="color:#6b7280;font-size:0.7rem;text-transform:none">(auto-filled from link, editable)</span></label>
-        <input type="text" id="meetingId" placeholder="e.g. 94576209569" oninput="generateDemo()">
-      </div>
-
-      <div class="form-group">
-        <label>Laptop / PC Mandatory?</label>
-        <div class="toggle-group">
-          <label class="toggle">
-            <input type="checkbox" id="laptopToggle" checked onchange="generateDemo()">
-            <span class="slider"></span>
-          </label>
-          <span class="toggle-lbl" id="laptopLabel">Yes — mention laptop required</span>
+      <div class="theme-block" data-in role="group" aria-labelledby="theme-title">
+        <p id="theme-title" class="theme-title">Choose a colour</p>
+        <div class="theme-opts">
+        <button type="button" class="theme-opt" data-theme-set="forest" aria-pressed="false"><span class="chip" style="--a:#0e1d18;--b:#ff8a5b"></span>Forest</button>
+        <button type="button" class="theme-opt" data-theme-set="midnight" aria-pressed="false"><span class="chip" style="--a:#12142a;--b:#ffc83d"></span>Midnight</button>
+        <button type="button" class="theme-opt" data-theme-set="rose" aria-pressed="false"><span class="chip" style="--a:#22101b;--b:#7cf0d0"></span>Plum</button>
+        <button type="button" class="theme-opt" data-theme-set="daylight" aria-pressed="false"><span class="chip" style="--a:#f4f5fb;--b:#5b3df5"></span>Daylight</button>
         </div>
       </div>
     </div>
-
-    <div class="card">
-      <h2>Email Subject</h2>
-      <div class="output-box" id="emailSubjectOutput" style="min-height:unset;padding:10px 14px;font-weight:600;color:#22d3ee;"></div>
-      <button class="copy-btn" id="copySubjectBtn" onclick="copyText('emailSubjectOutput','copySubjectBtn')">Copy Subject</button>
-      <hr class="divider">
-      <h2>Email Message</h2>
-      <div class="output-box" id="emailOutput"></div>
-      <button class="copy-btn" id="copyEmailBtn" onclick="copyText('emailOutput','copyEmailBtn')">Copy Email</button>
-      <hr class="divider">
-      <h2>WhatsApp Message</h2>
-      <div class="output-box" id="waOutput"></div>
-      <button class="copy-btn" id="copyWaBtn" onclick="copyText('waOutput','copyWaBtn')">Copy WhatsApp</button>
-    </div>
+    <ul class="tool-list">
+      <li data-in><button type="button" class="tool-row" data-open="demo"><span class="ic">📅</span><span><strong>Demo reminder</strong><span class="d">Email and WhatsApp for a scheduled session</span></span><span class="go">›</span></button></li>
+      <li data-in><button type="button" class="tool-row" data-open="reachout"><span class="ic">📞</span><span><strong>First reach out</strong><span class="d">Introduce yourself and ask for a call time</span></span><span class="go">›</span></button></li>
+      <li data-in><button type="button" class="tool-row" data-open="pricing"><span class="ic">💰</span><span><strong>Pricing plans</strong><span class="d">Share installment options in GBP, EUR or INR</span></span><span class="go">›</span></button></li>
+      <li data-in><button type="button" class="tool-row" data-open="summary"><span class="ic">📋</span><span><strong>Call summary</strong><span class="d">Recap the demo with pricing and discount terms</span></span><span class="go">›</span></button></li>
+      <li data-in><button type="button" class="tool-row" data-open="notint"><span class="ic">🚫</span><span><strong>Not interested</strong><span class="d">Log an internal note when a lead declines</span></span><span class="go">›</span></button></li>
+    </ul>
   </div>
-</div>
+</section>
 
-<!-- ═══ TAB 2: NOT INTERESTED ═══ -->
-<div class="tab-page" id="tab-notint">
-  <div class="grid2">
-    <div class="card">
-      <h2>Lead Details</h2>
-      <div class="form-group">
-        <label>Name</label>
-        <input type="text" id="ni-name" placeholder="e.g. Manpreet Kaur" oninput="generateNI()">
-      </div>
-      <div class="form-group">
-        <label>Phone</label>
-        <input type="text" id="ni-phone" placeholder="e.g. 44746610565" oninput="generateNI()">
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="text" id="ni-email" placeholder="e.g. name@gmail.com" oninput="generateNI()">
-      </div>
-      <div class="form-group">
-        <label>Dialer</label>
-        <div class="pill-group" id="dialer-pills">
-          <span class="pill active" onclick="selectDialerPill(this,'WhatsApp')">WhatsApp</span>
-          <span class="pill" onclick="selectDialerPill(this,'C7')">C7</span>
-          <span class="pill" onclick="selectDialerPill(this,'SMS')">SMS</span>
-          <span class="pill" onclick="selectDialerPill(this,'')">Custom</span>
+<div class="app">
+  <aside class="side">
+    <button type="button" class="brand" id="go-home" aria-label="Back to start"><i></i> Sales Tool</button>
+    <nav class="nav" role="tablist" aria-label="Tools">
+      <button role="tab" id="t-demo" data-tab="demo" aria-selected="true"><span class="ic">📅</span>Demo scheduled</button>
+      <button role="tab" id="t-notint" data-tab="notint" aria-selected="false"><span class="ic">🚫</span>Not interested</button>
+      <button role="tab" id="t-pricing" data-tab="pricing" aria-selected="false"><span class="ic">💰</span>Pricing</button>
+      <button role="tab" id="t-reachout" data-tab="reachout" aria-selected="false"><span class="ic">📞</span>Reach out</button>
+      <button role="tab" id="t-summary" data-tab="summary" aria-selected="false"><span class="ic">📋</span>Call summary</button>
+    </nav>
+    <div class="themes" role="group" aria-label="Colour theme">
+          <button type="button" class="swatch" data-theme-set="forest" style="--a:#0e1d18;--b:#ff8a5b" title="Forest" aria-label="Forest theme" aria-pressed="false"></button>
+          <button type="button" class="swatch" data-theme-set="midnight" style="--a:#12142a;--b:#ffc83d" title="Midnight" aria-label="Midnight theme" aria-pressed="false"></button>
+          <button type="button" class="swatch" data-theme-set="rose" style="--a:#22101b;--b:#7cf0d0" title="Plum" aria-label="Plum theme" aria-pressed="false"></button>
+          <button type="button" class="swatch" data-theme-set="daylight" style="--a:#f4f5fb;--b:#5b3df5" title="Daylight" aria-label="Daylight theme" aria-pressed="false"></button>
         </div>
-        <input type="text" id="ni-dialer-custom" placeholder="Custom dialer..." style="margin-top:6px;display:none" oninput="generateNI()">
+    <small>Fill the form, then copy the message.</small>
+  </aside>
+
+  <main>
+    <!-- ═══ DEMO ═══ -->
+    <section class="page active" id="page-demo" role="tabpanel" aria-labelledby="t-demo">
+      <div class="page-head">
+        <h1>Demo reminder</h1>
+        <p>Email and WhatsApp reminders for a scheduled demo session.</p>
       </div>
-      <div class="form-group">
-        <label>Source</label>
-        <div class="pill-group" id="source-pills">
-          <span class="pill" onclick="selectPill(this,'Facebook')">Facebook</span>
-          <span class="pill" onclick="selectPill(this,'DSA Website')">DSA Website</span>
-          <span class="pill" onclick="selectPill(this,'DSA - Internal N')">DSA - Internal N</span>
-          <span class="pill active" onclick="selectPill(this,'')">Custom</span>
+      <div class="grid2">
+        <div class="panel">
+          <h2>Session details</h2>
+          <div class="form-group">
+            <label for="parentName">Parent name</label>
+            <div class="sal-row">
+              <select id="salutation" aria-label="Salutation"><option>Sir</option><option>Ma'am</option></select>
+              <input type="text" id="parentName" placeholder="e.g. Akhil" value="Akhil" data-persist-off>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <select id="subject"><option>Coding</option><option>Maths</option><option>English</option><option>Science</option></select>
+          </div>
+          <div class="row2 form-group">
+            <div><label for="sessionDate">Date</label><input type="date" id="sessionDate"></div>
+            <div><label for="timeInput">Time</label><input type="time" id="timeInput" value="18:00"></div>
+          </div>
+          <div class="form-group">
+            <label for="timezoneLabel">Timezone</label>
+            <input type="text" id="timezoneLabel" value="BST" data-persist>
+          </div>
+          <div class="form-group">
+            <label for="zoomLink">Zoom link</label>
+            <input type="text" id="zoomLink" placeholder="https://zoom.us/j/..." value="https://zoom.us/j/94576209569">
+          </div>
+          <div class="form-group">
+            <label for="meetingId">Meeting ID <span class="hint">(filled from the link, you can edit it)</span></label>
+            <input type="text" id="meetingId" placeholder="e.g. 94576209569">
+          </div>
+          <div class="form-group">
+            <span class="field-label">Laptop or PC required?</span>
+            <label class="switch">
+              <input type="checkbox" id="laptopToggle" checked>
+              <span class="track"></span>
+              <span id="laptopLabel">Yes, mention it</span>
+            </label>
+          </div>
         </div>
-        <input type="text" id="ni-source-custom" placeholder="Custom source..." style="margin-top:6px" oninput="generateNI()">
-      </div>
-      <div class="form-group">
-        <label>Remarks</label>
-        <select class="remark-select" id="remark-preset" onchange="applyRemarkPreset()">
-          <option value="">— Choose a template —</option>
-          <option value="Parent mentioned they are already enrolled in another institution and are not interested at this time.">Already enrolled elsewhere</option>
-          <option value="Parent spoke with the child — the child does not wish to attend any online classes.">Child not interested in online classes</option>
-          <option value="Parent said it's not the right time financially. May revisit in the future.">Financial reasons / revisit later</option>
-          <option value="No response after multiple follow-ups. Marking as not interested.">No response / ghosted</option>
-          <option value="custom">Custom remark</option>
-        </select>
-        <textarea id="ni-remarks" placeholder="Write remark here..." oninput="generateNI()"></textarea>
-      </div>
-    </div>
-    <div class="card">
-      <h2>Internal Note</h2>
-      <div class="output-box" id="niOutput"></div>
-      <button class="copy-btn" id="copyNiBtn" onclick="copyText('niOutput','copyNiBtn')">Copy</button>
-    </div>
-  </div>
-</div>
 
-<!-- ═══ TAB 3: PRICING ═══ -->
-<div class="tab-page" id="tab-pricing">
-  <div class="grid2">
-    <div class="card">
-      <h2>Pricing Plans</h2>
-      <div class="grid2" style="margin-bottom: 16px;">
-        <div class="form-group" style="margin-bottom: 0;">
-          <label>Number of Students</label>
-          <input type="number" id="num-students" value="1" min="1" oninput="generatePricing()">
-        </div>
-        <div class="form-group" style="margin-bottom: 0;">
-          <label>Number of Subjects</label>
-          <input type="number" id="num-subjects" value="1" min="1" oninput="generatePricing()">
+        <div class="outputs">
+          <section class="out subject mail">
+            <header><h3>Email subject</h3><button class="copy" data-copy="emailSubjectOutput">Copy</button></header>
+            <div class="output-box" id="emailSubjectOutput"></div>
+          </section>
+          <section class="out mail">
+            <header><h3>Email message</h3><button class="copy" data-copy="emailOutput">Copy</button></header>
+            <div class="output-box" id="emailOutput"></div>
+          </section>
+          <section class="out wa">
+            <header><h3>WhatsApp message</h3><button class="copy" data-copy="waOutput">Copy</button></header>
+            <div class="output-box" id="waOutput"></div>
+          </section>
         </div>
       </div>
+    </section>
 
-      <div class="pricing-tabs">
-        <button class="ptab active" onclick="selectCurrency('GBP',this)">GBP (£)</button>
-        <button class="ptab" onclick="selectCurrency('EUR',this)">EUR (€)</button>
-        <button class="ptab" onclick="selectCurrency('INR',this)">INR (₹)</button>
+    <!-- ═══ NOT INTERESTED ═══ -->
+    <section class="page" id="page-notint" role="tabpanel" aria-labelledby="t-notint">
+      <div class="page-head">
+        <h1>Not interested note</h1>
+        <p>An internal note to log when a lead declines.</p>
       </div>
-      <div id="plans-container"></div>
-    </div>
-    <div class="card">
-      <h2>Include in Message</h2>
-      <div id="plan-toggles"></div>
-      <button class="gen-btn" onclick="generatePricing()">Generate Message</button>
-      <div class="output-box" id="pricingOutput"></div>
-      <button class="copy-btn" id="copyPricingBtn" onclick="copyText('pricingOutput','copyPricingBtn')">Copy</button>
-    </div>
-  </div>
+      <div class="grid2">
+        <div class="panel">
+          <h2>Lead details</h2>
+          <div class="form-group"><label for="ni-name">Name</label><input type="text" id="ni-name" placeholder="e.g. Manpreet Kaur"></div>
+          <div class="row2 form-group">
+            <div><label for="ni-phone">Phone</label><input type="text" id="ni-phone" placeholder="e.g. 44746610565"></div>
+            <div><label for="ni-email">Email</label><input type="text" id="ni-email" placeholder="name@gmail.com"></div>
+          </div>
+          <div class="form-group">
+            <span class="field-label">Dialer</span>
+            <div class="pill-group" id="dialer-pills" data-target="ni-dialer-custom">
+              <button type="button" class="pill active" data-val="WhatsApp">WhatsApp</button>
+              <button type="button" class="pill" data-val="C7">C7</button>
+              <button type="button" class="pill" data-val="SMS">SMS</button>
+              <button type="button" class="pill" data-val="">Custom</button>
+            </div>
+            <input type="text" id="ni-dialer-custom" class="pill-custom" placeholder="Custom dialer" hidden>
+          </div>
+          <div class="form-group">
+            <span class="field-label">Source</span>
+            <div class="pill-group" id="source-pills" data-target="ni-source-custom">
+              <button type="button" class="pill" data-val="Facebook">Facebook</button>
+              <button type="button" class="pill" data-val="DSA Website">DSA Website</button>
+              <button type="button" class="pill" data-val="DSA - Internal N">DSA - Internal N</button>
+              <button type="button" class="pill active" data-val="">Custom</button>
+            </div>
+            <input type="text" id="ni-source-custom" class="pill-custom" placeholder="Custom source">
+          </div>
+          <div class="form-group">
+            <label for="remark-preset">Remarks</label>
+            <select id="remark-preset" style="margin-bottom:8px">
+              <option value="">Choose a template</option>
+              <option value="Parent mentioned they are already enrolled in another institution and are not interested at this time.">Already enrolled elsewhere</option>
+              <option value="Parent spoke with the child — the child does not wish to attend any online classes.">Child not interested in online classes</option>
+              <option value="Parent said it's not the right time financially. May revisit in the future.">Financial reasons / revisit later</option>
+              <option value="No response after multiple follow-ups. Marking as not interested.">No response after follow-ups</option>
+              <option value="custom">Write my own</option>
+            </select>
+            <textarea id="ni-remarks" placeholder="Write the remark here"></textarea>
+          </div>
+        </div>
+        <div class="outputs">
+          <section class="out note">
+            <header><h3>Internal note</h3><button class="copy" data-copy="niOutput">Copy</button></header>
+            <div class="output-box" id="niOutput"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ PRICING ═══ -->
+    <section class="page" id="page-pricing" role="tabpanel" aria-labelledby="t-pricing">
+      <div class="page-head">
+        <h1>Pricing plans</h1>
+        <p>Adjust the rates, choose the plans to share, and copy the message.</p>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <h2>Plans</h2>
+          <div class="row2">
+            <div class="form-group"><label for="num-students">Students</label><input type="number" id="num-students" value="1" min="1"></div>
+            <div class="form-group"><label for="num-subjects">Subjects</label><input type="number" id="num-subjects" value="1" min="1"></div>
+          </div>
+          <div class="cur-tabs" role="group" aria-label="Currency">
+            <button type="button" class="active" data-cur="GBP">GBP £</button>
+            <button type="button" data-cur="EUR">EUR €</button>
+            <button type="button" data-cur="INR">INR ₹</button>
+          </div>
+          <div id="plans-container"></div>
+        </div>
+        <div class="outputs">
+          <div class="panel">
+            <h2>Plans to include</h2>
+            <div class="toggles" id="plan-toggles"></div>
+          </div>
+          <section class="out wa">
+            <header><h3>Pricing message</h3><button class="copy" data-copy="pricingOutput">Copy</button></header>
+            <div class="output-box" id="pricingOutput"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ REACH OUT ═══ -->
+    <section class="page" id="page-reachout" role="tabpanel" aria-labelledby="t-reachout">
+      <div class="page-head">
+        <h1>First reach out</h1>
+        <p>Introduce yourself and ask for a good time to call.</p>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <h2>Lead details</h2>
+          <div class="form-group"><label for="ro-bd">Your name (academic counsellor)</label><input type="text" id="ro-bd" placeholder="e.g. John" data-persist></div>
+          <div class="row2 form-group">
+            <div><label for="ro-parent">Parent name</label><input type="text" id="ro-parent" placeholder="e.g. Mr. Sharma"></div>
+            <div><label for="ro-child">Child name <span class="hint">(optional)</span></label><input type="text" id="ro-child" placeholder="e.g. Aarav"></div>
+          </div>
+          <div class="row2 form-group">
+            <div><label for="ro-phone">Phone</label><input type="text" id="ro-phone" placeholder="e.g. 9876543210"></div>
+            <div><label for="ro-email">Email <span class="hint">(optional)</span></label><input type="text" id="ro-email" placeholder="name@gmail.com"></div>
+          </div>
+          <div class="form-group"><label for="ro-course">Course interest</label><input type="text" id="ro-course" placeholder="e.g. Coding"></div>
+          <div class="form-group"><label for="ro-details">Additional details</label><textarea id="ro-details"></textarea></div>
+        </div>
+        <div class="outputs">
+          <section class="out wa">
+            <header><h3>WhatsApp message</h3><button class="copy" data-copy="reachOutWA">Copy</button></header>
+            <div class="output-box" id="reachOutWA"></div>
+          </section>
+          <section class="out mail">
+            <header><h3>Email message</h3><button class="copy" data-copy="reachOutEmail">Copy</button></header>
+            <div class="output-box" id="reachOutEmail"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CALL SUMMARY ═══ -->
+    <section class="page" id="page-summary" role="tabpanel" aria-labelledby="t-summary">
+      <div class="page-head">
+        <h1>Call summary</h1>
+        <p>Recap the demo for the parent, including pricing and the discount condition.</p>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <h2>Demo details</h2>
+          <div class="form-group"><label for="cs-parent">Parent name</label><input type="text" id="cs-parent"></div>
+          <div class="form-group"><label for="cs-kid">Kid name and age</label><input type="text" id="cs-kid" placeholder="e.g. Aarav (12 years)"></div>
+          <div class="row2 form-group">
+            <div><label for="cs-date">Demo date</label><input type="date" id="cs-date"></div>
+            <div><label for="cs-time">Demo time (BST)</label><input type="time" id="cs-time"></div>
+          </div>
+          <div class="row2 form-group">
+            <div><label for="cs-duration">Duration (minutes)</label><input type="number" id="cs-duration" placeholder="e.g. 60" min="1"></div>
+            <div><label for="cs-subject">Subject</label><select id="cs-subject"><option>Coding</option><option>Maths</option><option>Science</option><option>English</option></select></div>
+          </div>
+          <div class="form-group"><label for="cs-pricing">Pricing (£ / ₹ / €)</label><input type="text" id="cs-pricing" placeholder="e.g. £120 / ₹5000"></div>
+        </div>
+        <div class="outputs">
+          <section class="out wa">
+            <header><h3>WhatsApp summary</h3><button class="copy" data-copy="cs-wa">Copy</button></header>
+            <div class="output-box" id="cs-wa"></div>
+          </section>
+          <section class="out mail">
+            <header><h3>Email summary</h3><button class="copy" data-copy="cs-email">Copy</button></header>
+            <div class="output-box" id="cs-email"></div>
+          </section>
+        </div>
+      </div>
+    </section>
+  </main>
 </div>
 
-<!-- ═══ TAB 4: REACH OUT ═══ -->
-<div class="tab-page" id="tab-reachout">
-  <div class="grid2">
-    <div class="card">
-      <h2>Lead Details</h2>
+<div id="toast" role="status" aria-live="polite"></div>
 
-      <div class="form-group">
-        <label>Your Name (Academic Counsellor)</label>
-        <input type="text" id="ro-bd" placeholder="e.g. John / Magesh" oninput="generateReachOut()">
-      </div>
-
-      <div class="form-group">
-        <label>Parent Name</label>
-        <input type="text" id="ro-parent" placeholder="e.g. Mr. Sharma" oninput="generateReachOut()">
-      </div>
-
-      <div class="form-group">
-        <label>Child Name (Optional)</label>
-        <input type="text" id="ro-child" placeholder="e.g. Aarav" oninput="generateReachOut()">
-      </div>
-
-      <div class="form-group">
-        <label>Phone Number</label>
-        <input type="text" id="ro-phone" placeholder="e.g. 9876543210" oninput="generateReachOut()">
-      </div>
-
-      <div class="form-group">
-        <label>Email (Optional)</label>
-        <input type="text" id="ro-email" placeholder="e.g. name@gmail.com" oninput="generateReachOut()">
-      </div>
-
-      <div class="form-group">
-        <label>Course Interest</label>
-        <input type="text" id="ro-course" placeholder="e.g. Coding" oninput="generateReachOut()">
-      </div>
-
-      <div class="form-group">
-        <label>Additional Details</label>
-        <textarea id="ro-details" oninput="generateReachOut()"></textarea>
-      </div>
-    </div>
-
-    <div class="card">
-      <h2>WhatsApp Message</h2>
-      <div class="output-box" id="reachOutWA"></div>
-      <button class="copy-btn" id="copyROWaBtn" onclick="copyText('reachOutWA','copyROWaBtn')">Copy WhatsApp</button>
-
-      <hr class="divider">
-
-      <h2>Email Message</h2>
-      <div class="output-box" id="reachOutEmail"></div>
-      <button class="copy-btn" id="copyROEmailBtn" onclick="copyText('reachOutEmail','copyROEmailBtn')">Copy Email</button>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ TAB 5: CALL SUMMARY ═══ -->
-<div class="tab-page" id="tab-summary">
-  <div class="grid2">
-
-    <!-- FORM -->
-    <div class="card">
-      <h2>Call Summary Form</h2>
-
-      <div class="form-group">
-        <label>Parent Name</label>
-        <input type="text" id="cs-parent" oninput="generateSummary()">
-      </div>
-
-      <div class="form-group">
-        <label>Kid Name + Age</label>
-        <input type="text" id="cs-kid" placeholder="e.g. Aarav (12 years)" oninput="generateSummary()">
-      </div>
-
-      <div class="form-group">
-        <label>Demo Date</label>
-        <input type="date" id="cs-date" oninput="generateSummary()">
-      </div>
-
-      <div class="form-group">
-        <label>Demo Time (BST)</label>
-        <input type="time" id="cs-time" oninput="generateSummary()">
-      </div>
-
-      <div class="form-group">
-        <label>Duration (minutes)</label>
-        <input type="number" id="cs-duration" placeholder="e.g. 60" oninput="generateSummary()">
-      </div>
-
-      <div class="form-group">
-        <label>Subject</label>
-        <select id="cs-subject" onchange="generateSummary()">
-          <option>Coding</option>
-          <option>Maths</option>
-          <option>Science</option>
-          <option>English</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label>Pricing (£ / ₹ / €)</label>
-        <input type="text" id="cs-pricing" placeholder="e.g. £120 / ₹5000" oninput="generateSummary()">
-      </div>
-
-    </div>
-
-    <!-- OUTPUT -->
-    <div class="card">
-      <h2>WhatsApp Summary</h2>
-      <div class="output-box" id="cs-wa"></div>
-      <button class="copy-btn" id="btn-wa" onclick="copyText('cs-wa','btn-wa')">Copy WhatsApp</button>
-
-      <hr class="divider">
-
-      <h2>Email Summary</h2>
-      <div class="output-box" id="cs-email"></div>
-      <button class="copy-btn" id="btn-email" onclick="copyText('cs-email','btn-email')">Copy Email</button>
-    </div>
-
-  </div>
-</div>
+<!-- ═══ Loader animation (anime.js v4 · svg.createDrawable) ═══ -->
+<script type="module">
+  const loader = document.getElementById('loader');
+  try {
+    const { animate, svg, stagger } = await import('https://cdn.jsdelivr.net/npm/animejs@4.0.2/+esm');
+    window.A = { animate, svg, stagger };
+    window.__loaderAnim = animate(svg.createDrawable('#loader .line'), {
+      draw: ['0 0', '0 1', '1 1'],
+      ease: 'inOutQuad',
+      duration: 2000,
+      delay: stagger(100),
+      loop: true
+    });
+  } catch (e) {
+    // Offline or CDN blocked: fall back to a simple CSS pulse
+    document.documentElement.classList.add('no-anim');
+    window.__animeFailed = true;
+  }
+  window.dispatchEvent(new Event('anime-ready'));
+</script>
 
 <script>
-// ── TABS ──
-function switchTab(id, btn) {
-  document.querySelectorAll('.tab-page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  btn.classList.add('active');
-}
-
-// ── TIME ──
-function getTime() {
-  const v = document.getElementById('timeInput').value; if (!v) return '';
-  const [h, m] = v.split(':'); let hh = parseInt(h);
-  return String(hh % 12 || 12).padStart(2, '0') + ':' + m + ' ' + (hh >= 12 ? 'PM' : 'AM');
-}
-function fmtDate(s) {
-  if (!s) return ''; const [y, mo, d] = s.split('-'); return mo + '/' + d + '/' + y;
-}
+/* ───────── Loader dismissal (independent of the animation library) ───────── */
 (function () {
-  const t = new Date();
-  document.getElementById('sessionDate').value =
-    t.getFullYear() + '-' + String(t.getMonth() + 1).padStart(2, '0') + '-' + String(t.getDate()).padStart(2, '0');
+  const started = performance.now();
+  const MIN_MS = 2200; // let one full draw cycle play
+  function hide() {
+    const loader = document.getElementById('loader');
+    if (!loader || loader.classList.contains('done')) return;
+    if (window.onLoaderHide) window.onLoaderHide();
+    loader.classList.add('done');
+    setTimeout(() => { if (window.__loaderAnim) window.__loaderAnim.pause(); loader.remove(); }, 600);
+  }
+  function ready() {
+    const wait = Math.max(0, MIN_MS - (performance.now() - started));
+    setTimeout(hide, wait);
+  }
+  if (document.readyState === 'complete') ready(); else window.addEventListener('load', ready);
+  setTimeout(hide, 6000); // failsafe
 })();
 
-// ── AUTO-POPULATE MEETING ID FROM ZOOM LINK ──
-function extractMeetingId(link) {
-  const match = link.match(/\/j\/(\d+)/);
-  return match ? match[1] : '';
-}
-function onZoomLinkChange() {
-  const link = document.getElementById('zoomLink').value.trim();
-  const mid = extractMeetingId(link);
-  if (mid) document.getElementById('meetingId').value = mid;
-  generateDemo();
-}
-onZoomLinkChange();
+/* ───────── Helpers ───────── */
+const $ = id => document.getElementById(id);
+const val = id => $(id).value.trim();
 
-// ── DEMO GENERATE ──
+function todayStr() {
+  const t = new Date();
+  return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`;
+}
+function fmtDate(s) {
+  if (!s) return '';
+  const [y, m, d] = s.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+}
+function fmtTime(v) {
+  if (!v) return '';
+  const [h, m] = v.split(':'); const hh = parseInt(h, 10);
+  return `${String(hh % 12 || 12).padStart(2, '0')}:${m} ${hh >= 12 ? 'PM' : 'AM'}`;
+}
+function money(n) {
+  return n.toLocaleString('en-GB', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+const store = {
+  get(k) { try { return localStorage.getItem('salestool:' + k); } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem('salestool:' + k, v); } catch (e) {} }
+};
+
+/* ───────── Tabs ───────── */
+const tabs = [...document.querySelectorAll('[data-tab]')];
+// URL hash is a convenience only; sandboxed frames (e.g. previews) block history changes
+function setHash(name) {
+  try { history.replaceState(null, '', name ? '#' + name : location.pathname + location.search); } catch (e) {}
+}
+
+/* ───────── Motion helpers (anime.js) ───────── */
+const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const anim = () => (reduceMotion ? null : window.A || null);
+function whenAnime(cb) {
+  if (window.A || window.__animeFailed) return cb(anim());
+  window.addEventListener('anime-ready', () => cb(anim()), { once: true });
+}
+function clearInline(els) { els.forEach(el => { el.style.opacity = ''; el.style.transform = ''; }); }
+// Staggered fade-and-rise; per-item delay is a function-based value
+function rise(targets, offset = 0) {
+  const A = anim(); const els = Array.from(targets);
+  if (!A || !els.length) return;
+  A.animate(els, {
+    opacity: [0, 1], translateY: [18, 0],
+    duration: 480, ease: 'outQuart',
+    delay: (el, i) => offset + i * 70,
+    onComplete: () => clearInline(els)
+  });
+}
+
+/* ───────── Views: welcome page ↔ tools ───────── */
+let view = 'home';
+function setView(v) { view = v; document.body.dataset.view = v; }
+function pageTargets(page) { return page.querySelectorAll('.page-head, .panel, .out'); }
+function setTabState(name, focus) {
+  tabs.forEach(b => {
+    const on = b.dataset.tab === name;
+    b.setAttribute('aria-selected', on);
+    b.tabIndex = on ? 0 : -1;
+    if (on && focus) b.focus();
+  });
+}
+function currentTab() { return document.querySelector('.page.active').id.replace('page-', ''); }
+
+// Page to page inside the tool: old page slides out, new page rises in
+function switchTab(name, focus) {
+  setTabState(name, focus);
+  setHash(name);
+  const next = $('page-' + name);
+  const cur = document.querySelector('.page.active');
+  if (cur === next) return;
+  const swap = () => {
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p === next));
+    window.scrollTo({ top: 0 });
+    rise(pageTargets(next));
+  };
+  const A = anim();
+  if (!A || view !== 'tool') { swap(); return; }
+  A.animate(cur, {
+    opacity: [1, 0], translateX: [0, -28],
+    duration: 160, ease: 'inQuad',
+    onComplete: () => { clearInline([cur]); swap(); }
+  });
+}
+
+function enterTool(name) {
+  const A = anim(); if (!A) return;
+  const side = document.querySelector('.side');
+  A.animate(side, { opacity: [0, 1], translateX: [-36, 0], duration: 500, ease: 'outQuart', onComplete: () => clearInline([side]) });
+  const btns = Array.from(document.querySelectorAll('.nav button'));
+  A.animate(btns, { opacity: [0, 1], translateX: [-14, 0], duration: 400, ease: 'outQuart', delay: (el, i) => 150 + i * 60, onComplete: () => clearInline(btns) });
+  rise(pageTargets($('page-' + name)), 120);
+}
+function openTool(name) {
+  const go = () => {
+    setView('tool');
+    setTabState(name);
+    document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + name));
+    setHash(name);
+    window.scrollTo({ top: 0 });
+    enterTool(name);
+  };
+  const A = anim(); const home = $('home');
+  if (!A) return go();
+  A.animate(home, { opacity: [1, 0], translateY: [0, -24], duration: 260, ease: 'inQuad', onComplete: () => { clearInline([home]); go(); } });
+}
+function goHome() {
+  const run = () => {
+    setView('home');
+    setHash('');
+    window.scrollTo({ top: 0 });
+    introHome();
+  };
+  const A = anim(); const app = document.querySelector('.app');
+  $('home').classList.remove('shown');
+  if (!A) return run();
+  A.animate(app, { opacity: [1, 0], duration: 200, ease: 'inQuad', onComplete: () => { clearInline([app]); run(); } });
+}
+
+// Welcome page entrance: the </> mark draws itself, then the content rises in one by one
+function introHome() {
+  const home = $('home');
+  whenAnime(A => {
+    if (!A) { home.classList.add('shown'); return; }
+    const items = Array.from(home.querySelectorAll('[data-in]'));
+    A.animate(A.svg.createDrawable('.home-mark .line'), {
+      draw: ['0 0', '0 1'], duration: 1300, ease: 'inOutQuad', delay: A.stagger(120)
+    });
+    A.animate(items, {
+      opacity: [0, 1], translateY: [22, 0],
+      duration: 600, ease: 'outQuart',
+      delay: (el, i) => 200 + i * 90,
+      onComplete: () => { home.classList.add('shown'); clearInline(items); }
+    });
+  });
+}
+window.onLoaderHide = () => { if (view === 'home') introHome(); else enterTool(currentTab()); };
+
+function greet() {
+  const h = new Date().getHours();
+  const part = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  const n = $('home-name').value.trim();
+  $('home-title').textContent = n ? `${part}, ${n}` : part;
+}
+tabs.forEach((b, i) => {
+  b.addEventListener('click', () => switchTab(b.dataset.tab));
+  b.addEventListener('keydown', e => {
+    const dir = { ArrowDown: 1, ArrowRight: 1, ArrowUp: -1, ArrowLeft: -1 }[e.key];
+    if (dir) { e.preventDefault(); switchTab(tabs[(i + dir + tabs.length) % tabs.length].dataset.tab, true); }
+  });
+});
+
+/* ───────── Copy ───────── */
+let toastTimer;
+function toast(msg) {
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+function copyText(outputId, btn) {
+  const text = $(outputId).textContent;
+  const done = () => {
+    toast('Copied to clipboard');
+    if (!btn) return;
+    const A = anim();
+    if (A) A.animate(btn, { scale: [1, 1.14, 1], duration: 380, ease: 'outQuad', onComplete: () => { btn.style.transform = ''; } });
+    const orig = btn.textContent; btn.textContent = 'Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+  };
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) { toast('Copy failed, select the text manually'); }
+    ta.remove();
+  };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(done).catch(fallback);
+  else fallback();
+}
+document.addEventListener('click', e => {
+  const btn = e.target.closest('[data-copy]');
+  if (btn) copyText(btn.dataset.copy, btn);
+});
+
+/* ───────── Demo ───────── */
+function extractMeetingId(link) { const m = link.match(/\/j\/(\d+)/); return m ? m[1] : ''; }
+
 function generateDemo() {
-  const name = document.getElementById('parentName').value.trim() || '[Name]';
-  const sal = document.getElementById('salutation').value;
-  const subj = document.getElementById('subject').value;
-  const date = fmtDate(document.getElementById('sessionDate').value);
-  const time = getTime();
-  const tz = document.getElementById('timezoneLabel').value.trim() || 'BST';
-  const link = document.getElementById('zoomLink').value.trim();
-  const mid = document.getElementById('meetingId').value.trim();
-  const laptop = document.getElementById('laptopToggle').checked;
+  const name = val('parentName') || '[Name]';
+  const sal = $('salutation').value;
+  const subj = $('subject').value;
+  const dateRaw = $('sessionDate').value;
+  const date = fmtDate(dateRaw);
+  const time = fmtTime($('timeInput').value);
+  const tz = val('timezoneLabel') || 'BST';
+  const link = val('zoomLink');
+  const mid = val('meetingId');
+  const laptop = $('laptopToggle').checked;
+  const isToday = dateRaw === todayStr();
+  const when = isToday ? 'today' : (date ? `on ${date}` : 'soon');
 
-  document.getElementById('laptopLabel').textContent = laptop
-    ? 'Yes — mention laptop required' : 'No — skip laptop note';
+  $('laptopLabel').textContent = laptop ? 'Yes, mention it' : 'No, skip the note';
 
-  const mats = subj === 'Maths' ? 'notebook, pen, and calculator'
-    : subj === 'Coding' ? 'notebook, pen, and a laptop or PC'
-    : subj === 'English' ? 'notebook, pen, and a dictionary'
-    : 'notebook, pen, and their textbook';
+  const mats = {
+    Maths: 'notebook, pen, and calculator',
+    Coding: 'notebook, pen, and a laptop or PC',
+    English: 'notebook, pen, and a dictionary',
+    Science: 'notebook, pen, and their textbook'
+  }[subj];
 
-  const laptopLine = laptop
-    ? '\n\n🖥️ Please ensure your child joins from a laptop or PC for the best experience.'
-    : '';
+  const laptopLine = laptop ? '\n\n🖥️ Please ensure your child joins from a laptop or PC for the best experience.' : '';
 
-  document.getElementById('emailOutput').textContent =
+  $('emailSubjectOutput').textContent = `${subj} session ${isToday ? 'today' : 'scheduled'} at ${time} ${tz}${date ? ' | ' + date : ''}`;
+
+  $('emailOutput').textContent =
 `Dear ${name} ${sal},
 
 I hope you and your family are doing well.
 
-This is a friendly reminder about your child's upcoming ${subj} session scheduled for today.
+This is a friendly reminder about your child's upcoming ${subj} session scheduled for ${when}.
 
-Session Details:
+Session details:
   Date     : ${date}
   Time     : ${time} ${tz}
   Subject  : ${subj}
 
-Zoom Link  : ${link}
+Zoom link  : ${link}
 Meeting ID : ${mid}
 
 Please ensure your child is ready with the following materials:
@@ -439,264 +764,198 @@ Please ensure your child is ready with the following materials:
 
 We kindly request that your child joins the session 5 minutes early to avoid any last-minute delays.${laptopLine}
 
-Topics for today's session:
-  - Problem-Solving Techniques: interactive exercises with real-world examples
-  - Q&A: dedicated time for students to ask questions and clarify doubts
+Topics for the session:
+  - Problem-solving techniques: interactive exercises with real-world examples
+  - Q&A: dedicated time for students to ask questions and clear doubts
 
 We look forward to a productive and engaging session. If you have any questions or concerns, please don't hesitate to reach out.`;
 
-  document.getElementById('emailSubjectOutput').textContent =
-    `${subj} Session Scheduled at ${time} ${tz}${date ? ' | ' + date : ''}`;
-
-  const waLaptop = laptop ? ' Please use a laptop or PC. 💻' : '';
-  document.getElementById('waOutput').textContent =
+  $('waOutput').textContent =
 `Hi ${name} ${sal}! 😊
 
-📌 Reminder: *${subj} Session* — Today at *${time} ${tz}* (${date})
+📌 Reminder: *${subj} session* ${isToday ? 'today' : 'on ' + date} at *${time} ${tz}*
 
 🔗 Zoom: ${link}
 🔢 ID: ${mid}
 
-Please join 5 mins early.${waLaptop}`;
+Please join 5 mins early.${laptop ? ' Please use a laptop or PC. 💻' : ''}`;
 }
 
-// ── NOT INTERESTED ──
-let niSource = '';
-let niDialer = 'WhatsApp';
+$('zoomLink').addEventListener('input', () => {
+  const mid = extractMeetingId(val('zoomLink'));
+  if (mid) $('meetingId').value = mid;
+  generateDemo();
+});
+['salutation', 'parentName', 'subject', 'sessionDate', 'timeInput', 'timezoneLabel', 'meetingId', 'laptopToggle']
+  .forEach(id => $(id).addEventListener('input', generateDemo));
+$('sessionDate').value = todayStr();
+$('meetingId').value = extractMeetingId(val('zoomLink'));
 
-function selectPill(el, val) {
-  document.querySelectorAll('#source-pills .pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active'); niSource = val;
-  document.getElementById('ni-source-custom').style.display = val === '' ? 'block' : 'none';
-  generateNI();
+/* ───────── Not interested ───────── */
+function setupPills(groupId, onChange) {
+  const group = $(groupId);
+  const custom = $(group.dataset.target);
+  const state = { value: '' };
+  group.addEventListener('click', e => {
+    const pill = e.target.closest('.pill'); if (!pill) return;
+    group.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    state.value = pill.dataset.val;
+    custom.hidden = state.value !== '';
+    if (!custom.hidden) custom.focus();
+    onChange();
+  });
+  const active = group.querySelector('.pill.active');
+  state.value = active ? active.dataset.val : '';
+  custom.hidden = state.value !== '';
+  custom.addEventListener('input', onChange);
+  state.resolve = () => state.value || custom.value.trim();
+  return state;
 }
-
-function selectDialerPill(el, val) {
-  document.querySelectorAll('#dialer-pills .pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active'); niDialer = val;
-  document.getElementById('ni-dialer-custom').style.display = val === '' ? 'block' : 'none';
-  generateNI();
-}
-
-function applyRemarkPreset() {
-  const v = document.getElementById('remark-preset').value;
-  if (v && v !== 'custom') document.getElementById('ni-remarks').value = v;
-  else if (v === 'custom') document.getElementById('ni-remarks').value = '';
-  generateNI();
-}
+const dialer = setupPills('dialer-pills', () => generateNI());
+const source = setupPills('source-pills', () => generateNI());
 
 function generateNI() {
-  const name = document.getElementById('ni-name').value.trim() || '[Name]';
-  const phone = document.getElementById('ni-phone').value.trim() || '[Phone]';
-  const email = document.getElementById('ni-email').value.trim() || '[Email]';
-  const dialer = niDialer || document.getElementById('ni-dialer-custom').value.trim() || '[Dialer]';
-  const source = niSource || document.getElementById('ni-source-custom').value.trim() || '[Source]';
-  const remark = document.getElementById('ni-remarks').value.trim() || '[Remarks]';
-  document.getElementById('niOutput').textContent =
+  $('niOutput').textContent =
 `*Not Interested*
 
-Name : ${name}
-Phone number : ${phone}
-Email id : ${email}
-Dialer : ${dialer}
-Source : ${source}
-Remarks : ${remark}`;
+Name : ${val('ni-name') || '[Name]'}
+Phone number : ${val('ni-phone') || '[Phone]'}
+Email id : ${val('ni-email') || '[Email]'}
+Dialer : ${dialer.resolve() || '[Dialer]'}
+Source : ${source.resolve() || '[Source]'}
+Remarks : ${val('ni-remarks') || '[Remarks]'}`;
 }
+$('remark-preset').addEventListener('change', e => {
+  const v = e.target.value;
+  if (v === 'custom') { $('ni-remarks').value = ''; $('ni-remarks').focus(); }
+  else if (v) $('ni-remarks').value = v;
+  generateNI();
+});
+['ni-name', 'ni-phone', 'ni-email', 'ni-remarks'].forEach(id => $(id).addEventListener('input', generateNI));
 
-document.getElementById('ni-source-custom').style.display = 'block';
-document.getElementById('ni-dialer-custom').style.display = 'none';
-
-
-// ── PRICING ──
+/* ───────── Pricing ───────── */
 const currencies = {
-  GBP: { sym: '£', defaultRates: [8, 8, 9, 9.5, 10.3] },
-  EUR: { sym: '€', defaultRates: [9, 9, 10, 10.5, 11.5] },
-  INR: { sym: '₹', defaultRates: [850, 850, 950, 1000, 1100] }
+  GBP: { sym: '£', rates: [8, 8, 9, 9.5, 10.3] },
+  EUR: { sym: '€', rates: [9, 9, 10, 10.5, 11.5] },
+  INR: { sym: '₹', rates: [850, 850, 950, 1000, 1100] }
 };
-
 const planDefs = [
-  { key: 'oneshot', label: 'One-Shot Payment', installmentSessions: 144, months: null, rateIdx: 0 },
-  { key: 'p6month', label: '6-Month Installment', installmentSessions: 48, months: 6, rateIdx: 1 },
-  { key: 'p4month', label: '4-Month Installment', installmentSessions: 32, months: 4, rateIdx: 2 },
-  { key: 'p3month', label: '3-Month Installment', installmentSessions: 24, months: 3, rateIdx: 3 },
-  { key: 'p2month', label: '2-Month Installment', installmentSessions: 16, months: 2, rateIdx: 3 },
+  { key: 'oneshot', label: 'One-shot payment', sessions: 144, months: null, rateIdx: 0 },
+  { key: 'p6month', label: '6-month installment', sessions: 48, months: 6, rateIdx: 1 },
+  { key: 'p4month', label: '4-month installment', sessions: 32, months: 4, rateIdx: 2 },
+  { key: 'p3month', label: '3-month installment', sessions: 24, months: 3, rateIdx: 3 },
+  { key: 'p2month', label: '2-month installment', sessions: 16, months: 2, rateIdx: 3 }
 ];
-
+const planData = {};
+Object.keys(currencies).forEach(cur => {
+  planData[cur] = planDefs.map(p => ({ ...p, rate: currencies[cur].rates[p.rateIdx] }));
+});
 let activeCurrency = 'GBP';
-let planData = {};
 
-function initPlanData() {
-  ['GBP', 'EUR', 'INR'].forEach(cur => {
-    planData[cur] = planDefs.map(p => ({
-      ...p,
-      ratePerSession: currencies[cur].defaultRates[p.rateIdx]
-    }));
-  });
+function renderToggles() {
+  $('plan-toggles').innerHTML = planDefs.map((p, i) => `
+    <label class="switch">
+      <input type="checkbox" data-toggle="${i}" checked>
+      <span class="track"></span><span>${p.label}</span>
+    </label>`).join('');
 }
-initPlanData();
-
-function selectCurrency(cur, el) {
-  activeCurrency = cur;
-  document.querySelectorAll('.ptab').forEach(b => b.classList.remove('active'));
-  el.classList.add('active');
-  document.getElementById('plans-container').innerHTML = '';
-  document.getElementById('plan-toggles').innerHTML = '';
-  renderPlans();
-}
-
 function renderPlans() {
   const sym = currencies[activeCurrency].sym;
-  const plans = planData[activeCurrency];
-  const container = document.getElementById('plans-container');
-  const togglesDiv = document.getElementById('plan-toggles');
-
-  if (container.children.length === 0) {
-    container.innerHTML = ''; togglesDiv.innerHTML = '';
-    plans.forEach((p, i) => {
-      container.innerHTML += `
-<div class="plan-card">
-  <div class="plan-title">${p.label}</div>
-  <div class="plan-fields">
-    <div class="plan-field">
-      <label>Sessions in period</label>
-      <input type="number" value="${p.installmentSessions}" min="1"
-        oninput="updatePlan('${activeCurrency}',${i},'installmentSessions',this.value)">
-    </div>
-    <div class="plan-field">
-      <label>Rate per session (${sym})</label>
-      <input type="number" value="${p.ratePerSession}" min="0" step="0.1"
-        oninput="updatePlan('${activeCurrency}',${i},'ratePerSession',this.value)">
-    </div>
-  </div>
-  <div class="plan-computed" id="computed-plan-${i}"></div>
-</div>`;
-
-      togglesDiv.innerHTML += `
-<div class="toggle-group" style="margin-bottom:12px">
-  <label class="toggle"><input type="checkbox" id="toggle-plan-${i}" checked><span class="slider"></span></label>
-  <span class="toggle-lbl">${p.label}</span>
-</div>`;
-    });
-  }
-  updateCalculations();
+  $('plans-container').innerHTML = planData[activeCurrency].map((p, i) => `
+    <div class="plan">
+      <h4>${p.label}</h4>
+      <div class="row2">
+        <div><label for="sess-${i}">Sessions</label><input type="number" id="sess-${i}" data-i="${i}" data-f="sessions" value="${p.sessions}" min="1"></div>
+        <div><label for="rate-${i}">Rate per session (${sym})</label><input type="number" id="rate-${i}" data-i="${i}" data-f="rate" value="${p.rate}" min="0" step="0.1"></div>
+      </div>
+      <div class="plan-sum" id="sum-${i}"></div>
+    </div>`).join('');
+  updatePricing();
 }
-
-function updateCalculations() {
+function updatePricing() {
   const sym = currencies[activeCurrency].sym;
   const plans = planData[activeCurrency];
   plans.forEach((p, i) => {
-    const installAmt = (p.ratePerSession * p.installmentSessions).toFixed(2);
-    const avgPerSess = p.ratePerSession.toFixed(2);
-    const periodLabel = p.key === 'oneshot' ? 'one payment' : `every ${p.months} months`;
-    const computedEl = document.getElementById(`computed-plan-${i}`);
-    if (computedEl) {
-      computedEl.innerHTML = `<span>${p.installmentSessions}</span> sessions &nbsp;&middot;&nbsp; <span>${sym}${avgPerSess}/session</span> &nbsp;&middot;&nbsp; Total <span>${sym}${installAmt}</span> ${periodLabel}`;
-    }
+    const el = $('sum-' + i);
+    if (el) el.innerHTML = `<b>${p.sessions}</b> sessions · <b>${sym}${money(p.rate)}</b> per session · total <b>${sym}${money(p.rate * p.sessions)}</b> ${p.months ? 'every ' + p.months + ' months' : 'in one payment'}`;
   });
+  generatePricing();
 }
-
-function updatePlan(cur, idx, field, val) {
-  planData[cur][idx][field] = parseFloat(val) || 0;
-  updateCalculations();
-}
-
 function generatePricing() {
   const sym = currencies[activeCurrency].sym;
-  const plans = planData[activeCurrency];
-
-  const numStudents = document.getElementById('num-students')?.value || 1;
-  const numSubjects = document.getElementById('num-subjects')?.value || 1;
-  const studentText = numStudents == 1 ? '1 student' : `${numStudents} students`;
-  const subjectText = numSubjects == 1 ? '1 subject' : `${numSubjects} subjects`;
-
-  let lines = `*Pricing Details (${activeCurrency})*\nFor ${studentText} and ${subjectText} | Valid only for enrollment in this session\n`;
-
-  plans.forEach((p, i) => {
-    const chk = document.getElementById(`toggle-plan-${i}`);
-    if (!chk || !chk.checked) return;
-    const installAmt = (p.ratePerSession * p.installmentSessions).toFixed(2);
-    const periodLabel = p.key === 'oneshot' ? '(one payment)' : `every ${p.months} months`;
-    lines += `\n*${p.label}*\n`;
-    lines += `  • ${p.installmentSessions} sessions${p.key !== 'oneshot' ? ' over ' + p.months + ' months' : ''}\n`;
-    lines += `  • ${sym}${p.ratePerSession.toFixed(2)}/session\n`;
-    lines += `  • Total of ${sym}${installAmt} ${periodLabel}\n`;
+  const n = Math.max(1, parseInt($('num-students').value, 10) || 1);
+  const s = Math.max(1, parseInt($('num-subjects').value, 10) || 1);
+  let out = `*Pricing Details (${activeCurrency})*\nFor ${n} ${n === 1 ? 'student' : 'students'} and ${s} ${s === 1 ? 'subject' : 'subjects'} | Valid only for enrollment in this session\n`;
+  planData[activeCurrency].forEach((p, i) => {
+    const chk = document.querySelector(`[data-toggle="${i}"]`);
+    if (chk && !chk.checked) return;
+    out += `\n*${p.label}*\n`;
+    out += `  • ${p.sessions} sessions${p.months ? ' over ' + p.months + ' months' : ''}\n`;
+    out += `  • ${sym}${money(p.rate)}/session\n`;
+    out += `  • Total of ${sym}${money(p.rate * p.sessions)} ${p.months ? 'every ' + p.months + ' months' : '(one payment)'}\n`;
   });
-
-  document.getElementById('pricingOutput').textContent = lines;
+  $('pricingOutput').textContent = out;
 }
+$('plans-container').addEventListener('input', e => {
+  const t = e.target; if (!t.dataset.f) return;
+  planData[activeCurrency][+t.dataset.i][t.dataset.f] = parseFloat(t.value) || 0;
+  updatePricing();
+});
+$('plan-toggles').addEventListener('change', generatePricing);
+['num-students', 'num-subjects'].forEach(id => $(id).addEventListener('input', generatePricing));
+document.querySelector('.cur-tabs').addEventListener('click', e => {
+  const b = e.target.closest('[data-cur]'); if (!b) return;
+  activeCurrency = b.dataset.cur;
+  document.querySelectorAll('.cur-tabs button').forEach(x => x.classList.toggle('active', x === b));
+  renderPlans();
+  rise(document.querySelectorAll('#plans-container .plan'));
+});
 
-// ── COPY (unified, works for all buttons) ──
-function copyText(outputId, btnId) {
-  const el = document.getElementById(outputId);
-  const plainText = el.textContent;
-
-  const btn = document.getElementById(btnId);
-  const orig = btn ? btn.textContent : '';
-
-  function showCopied() {
-    if (!btn) return;
-    btn.textContent = 'Copied!';
-    btn.classList.add('copied');
-    setTimeout(() => {
-      btn.textContent = orig;
-      btn.classList.remove('copied');
-    }, 2000);
-  }
-
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(plainText).then(showCopied).catch(() => fallbackCopy());
-  } else {
-    fallbackCopy();
-  }
-
-  function fallbackCopy() {
-    const ta = document.createElement('textarea');
-    ta.value = plainText;
-    ta.style.position = 'absolute';
-    ta.style.left = '-9999px';
-    document.body.appendChild(ta);
-    ta.select();
-    try { document.execCommand('copy'); showCopied(); } catch (e) { }
-    document.body.removeChild(ta);
-  }
-}
-
-// ── REACH OUT ──
+/* ───────── Reach out ───────── */
 function generateReachOut() {
-  const bd = document.getElementById('ro-bd').value.trim() || '{{NAME}}';
-  const parent = document.getElementById('ro-parent').value.trim() || '';
+  const bd = val('ro-bd') || '{{NAME}}';
+  const parent = val('ro-parent');
+  const child = val('ro-child');
+  const course = val('ro-course');
+  const extra = val('ro-details');
+  const forWhom = child ? ` for ${child}` : '';
+  const topic = course ? ` ${course}` : '';
 
-  const waMsg =
-`Hello, I am ${bd}, Academic Counsellor from Codeyoung. I would like to reach out regarding the free demo session. Kindly let me know a convenient time for a call so I can explain all the details.`;
+  $('reachOutWA').textContent =
+`Hello${parent ? ' ' + parent : ''}, I am ${bd}, Academic Counsellor from Codeyoung. I would like to reach out regarding the free${topic} demo session${forWhom}. Kindly let me know a convenient time for a call so I can explain all the details.${extra ? '\n\n' + extra : ''}`;
 
-  const emailMsg =
-`Dear${parent ? ' ' + parent : ' Parent'},
+  $('reachOutEmail').textContent =
+`Dear ${parent || 'Parent'},
 
-I hope you are doing well. I am ${bd}, Academic Counsellor from Codeyoung. I am reaching out regarding the free demo session. Kindly let me know a suitable time for a call so I can explain the complete details.`;
+I hope you are doing well. I am ${bd}, Academic Counsellor from Codeyoung. I am reaching out regarding the free${topic} demo session${forWhom}. Kindly let me know a suitable time for a call so I can explain the complete details.${extra ? '\n\n' + extra : ''}
 
-  document.getElementById('reachOutWA').textContent = waMsg;
-  document.getElementById('reachOutEmail').textContent = emailMsg;
+Warm regards,
+${bd}
+Codeyoung`;
 }
+['ro-bd', 'ro-parent', 'ro-child', 'ro-phone', 'ro-email', 'ro-course', 'ro-details']
+  .forEach(id => $(id).addEventListener('input', generateReachOut));
 
-// ── CALL SUMMARY ──
+/* ───────── Call summary ───────── */
 function generateSummary() {
-  const parent = document.getElementById('cs-parent').value || '[Parent Name]';
-  const kid = document.getElementById('cs-kid').value || '[Kid Name & Age]';
-  const date = document.getElementById('cs-date').value || '[Date]';
-  const time = document.getElementById('cs-time').value || '[Time]';
-  const duration = document.getElementById('cs-duration').value || '[Duration]';
-  const subject = document.getElementById('cs-subject').value || '[Subject]';
-  const pricing = document.getElementById('cs-pricing').value || '[Pricing]';
+  const parent = val('cs-parent') || '[Parent name]';
+  const kid = val('cs-kid') || '[Kid name and age]';
+  const date = fmtDate($('cs-date').value) || '[Date]';
+  const time = fmtTime($('cs-time').value) || '[Time]';
+  const duration = val('cs-duration') || '[Duration]';
+  const subject = $('cs-subject').value;
+  const pricing = val('cs-pricing') || '[Pricing]';
 
-  const email =
+  $('cs-email').textContent =
 `Dear ${parent},
 
 Here is the call summary for your child's demo session:
 
-📌 Parent Name: ${parent}
+📌 Parent name: ${parent}
 👶 Kid: ${kid}
-📅 Demo Date: ${date}
-⏰ Demo Time (BST): ${time}
+📅 Demo date: ${date}
+⏰ Demo time (BST): ${time}
 ⏳ Duration: ${duration} minutes
 📚 Subject: ${subject}
 💰 Pricing: ${pricing}
@@ -706,7 +965,7 @@ To avail the discount, the payment must be completed within the session itself.
 
 If you have any questions, feel free to reach out.`;
 
-  const wa =
+  $('cs-wa').textContent =
 `Hi ${parent}! 😊
 
 Here is your demo call summary:
@@ -721,18 +980,57 @@ Here is your demo call summary:
 ⚠️ Discount is applicable only if payment is done within the session.
 
 Let us know if you need any help! 🚀`;
-
-  document.getElementById('cs-email').textContent = email;
-  document.getElementById('cs-wa').textContent = wa;
 }
+['cs-parent', 'cs-kid', 'cs-date', 'cs-time', 'cs-duration', 'cs-subject', 'cs-pricing']
+  .forEach(id => $(id).addEventListener('input', generateSummary));
 
-// ── INIT ──
-generateReachOut();
+/* ───────── Remember a few fields between visits ───────── */
+document.querySelectorAll('[data-persist]').forEach(el => {
+  const saved = store.get(el.id);
+  if (saved !== null) el.value = saved;
+  el.addEventListener('input', () => store.set(el.id, el.value));
+});
+
+/* ───────── Init ───────── */
+renderToggles();
+renderPlans();
 generateDemo();
 generateNI();
-renderPlans();
+generateReachOut();
 generateSummary();
-</script>
+/* ───────── Colour themes ───────── */
+function applyTheme(t, save) {
+  document.documentElement.dataset.theme = t;
+  document.querySelectorAll('[data-theme-set]').forEach(b => b.setAttribute('aria-pressed', b.dataset.themeSet === t));
+  if (save) store.set('theme', t);
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-theme-set]');
+  if (b) applyTheme(b.dataset.themeSet, true);
+});
+applyTheme(document.documentElement.dataset.theme || 'forest', false);
 
+/* ───────── Welcome page wiring ───────── */
+$('home-name').value = $('ro-bd').value;
+greet();
+$('home-name').addEventListener('input', () => {
+  const v = $('home-name').value;
+  $('ro-bd').value = v; store.set('ro-bd', v);
+  generateReachOut(); greet();
+});
+$('ro-bd').addEventListener('input', () => { $('home-name').value = $('ro-bd').value; greet(); });
+document.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => openTool(b.dataset.open)));
+$('go-home').addEventListener('click', goHome);
+
+// A direct link like #pricing skips the welcome page; otherwise start there
+const initial = location.hash.slice(1);
+if (tabs.some(t => t.dataset.tab === initial)) {
+  setView('tool');
+  setTabState(initial);
+  document.querySelectorAll('.page').forEach(p => p.classList.toggle('active', p.id === 'page-' + initial));
+} else {
+  setView('home');
+}
+</script>
 </body>
 </html>
